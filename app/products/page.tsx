@@ -1,14 +1,25 @@
 'use client'
 
+import Link from 'next/link'
 import { ProductCard } from '@/components/product/product-card'
+import { HeartIcon } from '@/components/icons/heart'
 import products from '@/data/products.json'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCartStore } from '@/stores/cart-store'
 
 export default function ProductsPage () {
 	const [bannerVisible, setBannerVisible] = useState(true)
 	const [mobileFilterOpen, setMobileFilterOpen] = useState(false)
-	const cartCount = useCartStore((state) => state.getCount())
+	const [cartCount, setCartCount] = useState(0)
+	const getCount = useCartStore((state) => state.getCount)
+
+	useEffect(() => {
+		setCartCount(getCount())
+		const unsubscribe = useCartStore.subscribe(
+			() => setCartCount(getCount()),
+		)
+		return unsubscribe
+	}, [])
 
 	return (
 		<div className='relative flex min-h-screen w-full flex-col
@@ -44,25 +55,32 @@ export default function ProductsPage () {
 						<a href='#' className='text-text-light'>Home</a>
 						<a href='#' className='text-text-light'>My Orders</a>
 					</nav>
+					<button className='hidden md:flex items-center
+						justify-center rounded-full size-10 text-text-light
+						hover:bg-primary/10'>
+						<HeartIcon className='text-text-light' />
+					</button>
 					<button
 						onClick={() => setMobileFilterOpen(true)}
 						className='flex md:hidden items-center gap-2 text-text-light'
 					>
 						⚙️
 					</button>
-					<button className='relative flex cursor-pointer items-center
-						justify-center rounded-full size-10
-						bg-primary/20'>
-						🛒
-						{cartCount > 0 && (
-							<span className='absolute -top-1 -right-1 flex
-								items-center justify-center rounded-full
-								bg-red-500 text-white text-xs font-bold
-								size-5'>
-								{cartCount}
-							</span>
-						)}
-					</button>
+					<Link href='/cart'>
+						<button className='relative flex cursor-pointer items-center
+							justify-center rounded-full size-10
+							bg-primary/20'>
+							🛒
+							{cartCount > 0 && (
+								<span className='absolute -top-1 -right-1 flex
+									items-center justify-center rounded-full
+									bg-red-500 text-white text-xs font-bold
+									size-5'>
+									{cartCount}
+								</span>
+							)}
+						</button>
+					</Link>
 					<div className='size-10 rounded-full
 						bg-gradient-to-br from-soft-mint to-primary'>
 					</div>
