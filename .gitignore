@@ -12,9 +12,13 @@ pnpm-lock.yaml
 # Next.js
 /.next/
 /out/
+apps/*/.next/
+apps/*/out/
 
 # Production
 /build
+apps/*/build
+apps/*/dist
 
 # Misc
 .DS_Store
@@ -30,9 +34,11 @@ yarn-error.log*
 
 # Local env files
 .env*.local
+apps/*/.env*.local
 
 # Vercel
 .vercel
+apps/*/.vercel
 
 # IDE
 .vscode/
@@ -50,3 +56,20 @@ Thumbs.db
 # Logs
 logs
 *.log
+
+# Foundry / Smart Contracts
+out/
+cache/
+broadcast/
+packages/contracts/out/
+packages/contracts/cache/
+packages/contracts/broadcast/
+*.sol.js
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary files
+*.tmp
+*.temp

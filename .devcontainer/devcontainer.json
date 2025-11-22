@@ -1,24 +1,33 @@
 {
-    "name": "Next.js Dev Container",
+    "name": "IDCom Monorepo Dev Container",
     "build": {
         "dockerfile": "Dockerfile"
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/node:1": {
-            "version": "22"
-        }
     },
     "customizations": {
         "vscode": {
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "esbenp.prettier-vscode",
-                "bradlc.vscode-tailwindcss"
+                "bradlc.vscode-tailwindcss",
+                "NomicFoundation.hardhat-solidity",
+                "JuanBlanco.solidity"
             ]
         }
     },
     "forwardPorts": [
-        3000
+        3000,
+        3001
     ],
-    "postCreateCommand": "npm install"
+    "portsAttributes": {
+        "3000": {
+            "label": "Ecommerce App",
+            "onAutoForward": "notify"
+        },
+        "3001": {
+            "label": "Wallet App",
+            "onAutoForward": "notify"
+        }
+    },
+    "postCreateCommand": "npm install",
+    "remoteUser": "vscode"
 }
