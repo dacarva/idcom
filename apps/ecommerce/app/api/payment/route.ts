@@ -64,6 +64,8 @@ export async function GET(req: Request) {
     const decoded = decodeXPaymentResponse(paymentHeader);
 
     //BY PASS VERIFY AND SETTLE FOR DEVELOPMENT TESTING
+    //wait 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 5000));
     return NextResponse.json(
       {
         status: 'paid',
