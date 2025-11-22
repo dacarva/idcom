@@ -1,5 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 import { HeartIcon } from '@/components/icons/heart'
+import { useProductsFilterStore } from '@/stores/products-filter-store'
+import { useFavoritesStore } from '@/stores/favorites-store'
+import { useState, useEffect } from 'react'
 
 interface AppHeaderProps {
 	cartCount?: number
@@ -18,6 +23,14 @@ export function AppHeader ({
 	onMobileMenuClick,
 	navItems = [],
 }: AppHeaderProps) {
+	const searchQuery = useProductsFilterStore((state) => state.searchQuery)
+	const setSearchQuery = useProductsFilterStore((state) => state.setSearchQuery)
+	const favoritesCount = useFavoritesStore((state) => state.getCount())
+	const [mounted, setMounted] = useState(false)
+
+	useEffect(() => {
+		setMounted(true)
+	}, [])
 	return (
 		<header className='sticky top-0 z-20 flex items-center justify-between border-b border-border-light px-4 py-3 sm:px-8 md:px-10 lg:px-20 bg-background-light/80 backdrop-blur-sm'>
 			{/* Logo */}
@@ -29,11 +42,13 @@ export function AppHeader ({
 			</div>
 
 			{/* Search */}
-			{showSearch && (
+			{showSearch && mounted && (
 				<div className='hidden md:flex flex-1 justify-center px-8'>
 					<input
 						type='text'
 						placeholder='Search products...'
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
 						className='w-full max-w-md rounded-lg bg-soft-mint/30 text-sm text-text-light placeholder:text-text-light/60 px-4 py-2 border-0 focus:outline-none focus:ring-2 focus:ring-primary/50'
 					/>
 				</div>
@@ -57,10 +72,17 @@ export function AppHeader ({
 				)}
 
 				{/* Favorites */}
-				{showFavorites && (
-					<button className='hidden md:flex items-center justify-center rounded-full size-10 text-text-light hover:bg-primary/10'>
-						<HeartIcon className='text-text-light' />
-					</button>
+				{showFavorites && mounted && (
+					<Link href='/favorites'>
+						<button className='hidden md:flex items-center justify-center rounded-full size-10 text-text-light hover:bg-primary/10 relative'>
+							<HeartIcon className='text-text-light' />
+							{favoritesCount > 0 && (
+								<span className='absolute top-0 right-0 flex items-center justify-center w-5 h-5 bg-primary text-white text-xs font-bold rounded-full'>
+									{favoritesCount}
+								</span>
+							)}
+						</button>
+					</Link>
 				)}
 
 				{/* Cart */}
