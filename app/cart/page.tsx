@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { AppHeader } from '@/components/layout/app-header'
 import { Breadcrumb } from '@/components/layout/breadcrumb'
 import { useCartStore } from '@/stores/cart-store'
+import { useUserStore } from '@/stores/user-store'
 import { Button } from '@/components/ui/button'
 
 export default function CartPage () {
@@ -13,6 +14,8 @@ export default function CartPage () {
 	const updateQuantity = useCartStore((state) => state.updateQuantity)
 	const removeItem = useCartStore((state) => state.removeItem)
 	const getCount = useCartStore((state) => state.getCount)
+	const user = useUserStore((state) => state.user)
+	const isVerified = user?.hasSubsidy ?? false
 
 	const [mounted, setMounted] = useState(false)
 	const [cartCount, setCartCount] = useState(0)
@@ -31,7 +34,7 @@ export default function CartPage () {
 	}
 
 	const subtotal = getSubtotal()
-	const subsidy = subtotal * 0.3
+	const subsidy = isVerified ? subtotal * 0.3 : 0
 	const shipping = 5.0
 	const total = subtotal - subsidy + shipping
 
@@ -192,25 +195,28 @@ export default function CartPage () {
 										</span>
 										<span className='font-medium
 											text-gray-900'>
-											${subtotal.toFixed(2)}
+											${getSubtotal().toFixed(2)}
 										</span>
 									</div>
 
-									<div className='flex justify-between'>
-										<div className='flex items-center gap-1.5'>
-											<span className='text-gray-600'>
-												30% Subsidy
-											</span>
-											<span title='Discount for eligible users.'
-												className='text-gray-400 cursor-help'>
-												ℹ️
+									{isVerified && (
+										<div className='flex justify-between'>
+											<div className='flex items-center gap-1.5'>
+												<span className='text-gray-600'>
+													30% Subsidy
+												</span>
+												<span title='Discount for eligible users.'
+													className='text-gray-400 cursor-help'>
+													ℹ️
+												</span>
+											</div>
+											<span className='font-medium
+												text-green-600'>
+												-${subsidy.toFixed(2)}
 											</span>
 										</div>
-										<span className='font-medium
-											text-green-600'>
-											-${subsidy.toFixed(2)}
-										</span>
-									</div>
+									)}
+
 
 									<div className='flex justify-between'>
 										<span className='text-gray-600'>

@@ -176,10 +176,12 @@ export default function OrderConfirmationPage() {
                       <span>Shipping</span>
                       <span>${order.shipping.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-green-600">
-                      <span>Subsidy (30%)</span>
-                      <span>-${order.subsidy.toFixed(2)}</span>
-                    </div>
+                    {order.subsidy > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>Subsidy (30%)</span>
+                        <span>-${order.subsidy.toFixed(2)}</span>
+                      </div>
+                    )}
                 </div>
                 <div className="border-t border-[#e7f3e7] pt-4">
                   <div className="flex justify-between items-center">

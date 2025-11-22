@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useCartStore } from '@/stores/cart-store'
+import { useUserStore } from '@/stores/user-store'
 import { AppHeader } from '@/components/layout/app-header'
 import { Breadcrumb } from '@/components/layout/breadcrumb'
 
@@ -25,6 +26,8 @@ export default function CheckoutPage() {
   const getSubtotal = useCartStore((state) => state.getSubtotal)
   const getCount = useCartStore((state) => state.getCount)
   const clear = useCartStore((state) => state.clear)
+  const user = useUserStore((state) => state.user)
+  const isVerified = user?.hasSubsidy ?? false
   
   const [mounted, setMounted] = useState(false)
   const [cartCount, setCartCount] = useState(0)
@@ -74,7 +77,7 @@ export default function CheckoutPage() {
   }
 
   const subtotal = getSubtotal()
-  const subsidy = subtotal * 0.3
+  const subsidy = isVerified ? subtotal * 0.3 : 0
   const shipping = 5.0
   const total = subtotal - subsidy + shipping
 
@@ -395,23 +398,25 @@ export default function CheckoutPage() {
                       <span>Shipping</span>
                       <span>${shipping.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-green-600">
-                      <div className="flex items-center gap-1">
-                        <span>Your 30% Subsidy Saving</span>
-                        <svg
-                          className="w-4 h-4"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
+                    {isVerified && (
+                      <div className="flex justify-between text-green-600">
+                        <div className="flex items-center gap-1">
+                          <span>Your 30% Subsidy Saving</span>
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span>-${subsidy.toFixed(2)}</span>
                       </div>
-                      <span>-${subsidy.toFixed(2)}</span>
-                    </div>
+                    )}
                   </div>
 
                   <div className="my-6 border-t border-[#e7f3e7]" />
