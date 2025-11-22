@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { HeartIcon } from '@/components/icons/heart'
 import { useCartStore } from '@/stores/cart-store'
 import { Button } from '@/components/ui/button'
 
@@ -60,11 +59,6 @@ export default function CartPage () {
 						</nav>
 
 						<div className='flex items-center gap-3'>
-						<button className='flex h-10 w-10 items-center
-							justify-center rounded-full bg-gray-100
-							text-gray-600 hover:bg-green-100'>
-							<HeartIcon />
-						</button>
 						<Link href='/cart'>
 							<button className='flex h-10 w-10 items-center
 								justify-center rounded-full bg-green-100
