@@ -1,29 +1,26 @@
 {
-  "name": "@idcom/ecommerce",
+  "name": "@idcom/wallet",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@selfxyz/qrcode": "^1.0.17",
+    "@privy-io/react-auth": "^3.7.0",
     "ethers": "^6.15.0",
     "next": "16.0.3",
     "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-icons": "^5.5.0",
-    "x402-fetch": "^0.7.3",
-    "zustand": "^5.0.8"
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "@tailwindcss/forms": "^0.5.10",
-    "@tailwindcss/postcss": "^4.1.17",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "tailwindcss": "^4",

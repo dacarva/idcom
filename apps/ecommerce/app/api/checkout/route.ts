@@ -23,7 +23,8 @@ export async function GET(request: NextRequest) {
     // TODO: Integrate with payment provider (Stripe, PayPal, etc.)
     // Generate payment link pointing to external wallet/payment backend
     const walletBackendUrl = process.env.NEXT_PUBLIC_WALLET_URL || 'http://localhost:3001'
-    const externalPaymentLink = `${walletBackendUrl}/api/checkout?amount=${parsedAmount}`
+    // WE ARE USING A FIXED AMOUNT FOR NOW, BECAUSE FOR TESTING THAT IS THE MAX AMOUNT ALLOWED
+    const externalPaymentLink = `${walletBackendUrl}/api/payment?amount=0.1`
     
     const paymentData = {
       status: 'success',
