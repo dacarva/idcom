@@ -117,7 +117,7 @@ export default function CheckoutPage() {
       if (!data.paymentLink) throw new Error('No payment link returned')
     } catch (error) {
       console.error('Error generating payment link:', error)
-      showError('An error occurred while generating the payment link. Please try again.')
+      showError('Error generating link')
     } finally {
       setIsProcessing(false)
     }
@@ -126,7 +126,7 @@ export default function CheckoutPage() {
   const handleCopyToClipboard = () => {
     if (paymentLink) {
       navigator.clipboard.writeText(paymentLink)
-      setToast({ message: 'Payment link copied to clipboard!', type: 'success' })
+      setToast({ message: 'Link copied!', type: 'success' })
       setTimeout(() => setToast(null), 3000)
     }
   }
@@ -187,7 +187,7 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Error processing payment:', error)
-      showError('An error occurred while processing the payment. Please try again.')
+      showError('Payment error')
       setIsProcessing(false)
     }
   }
@@ -196,10 +196,12 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-[#F7F9F7]">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-in fade-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 left-4 right-4 md:left-1/2 md:transform md:-translate-x-1/2 md:w-96 z-50 animate-in fade-in slide-in-from-bottom-2">
           <div
-            className={`rounded-lg px-4 py-3 text-white font-medium shadow-lg ${
-              toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            className={`rounded-lg px-6 py-4 text-center font-medium shadow-lg ${
+              toast.type === 'success'
+                ? 'bg-primary text-[#0d1b0d]'
+                : 'bg-red-100 text-red-600 border border-red-200'
             }`}
           >
             {toast.message}
