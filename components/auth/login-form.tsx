@@ -1,19 +1,33 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Divider } from '@/components/ui/divider'
 import { SocialButton } from '@/components/auth/social-button'
-import { SubsidyModal } from '@/components/feedback/subsidy-modal'
+import { useUserStore } from '@/stores/user-store'
 import Link from 'next/link'
 
 export function LoginForm () {
-	const [showSubsidy, setShowSubsidy] = useState(false)
+	const router = useRouter()
+	const login = useUserStore((state) => state.login)
+	const [email, setEmail] = useState('')
+	const [phone, setPhone] = useState('')
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		setShowSubsidy(true)
+		if (email && phone) {
+			// Extract name from email for now
+			const name = email.split('@')[0]
+			login(email, name)
+			// If email is verified demo, go straight to products
+			if (email === 'verified@idcom.com') {
+				router.push('/products')
+			} else {
+				router.push('/verify-subsidy')
+			}
+		}
 	}
 
 	return (
@@ -23,14 +37,40 @@ export function LoginForm () {
 					label='Email address'
 					type='email'
 					placeholder='Enter your email'
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
 					required
 				/>
 				<Input
 					label='Phone number'
 					type='tel'
 					placeholder='Enter your phone number'
+					value={phone}
+					onChange={(e) => setPhone(e.target.value)}
 					required
 				/>
+				<div className='space-y-2'>
+					<button
+						type='button'
+						onClick={() => {
+							setEmail('demo@idcom.com')
+							setPhone('+1 (555) 123-4567')
+						}}
+						className='w-full text-xs text-text-light/60 hover:text-primary transition-colors p-2 rounded hover:bg-primary/5 text-left'
+					>
+						📋 Demo (Unverified): demo@idcom.com
+					</button>
+					<button
+						type='button'
+						onClick={() => {
+							setEmail('verified@idcom.com')
+							setPhone('+1 (555) 987-6543')
+						}}
+						className='w-full text-xs text-text-light/60 hover:text-primary transition-colors p-2 rounded hover:bg-primary/5 text-left'
+					>
+						✓ Demo (Verified): verified@idcom.com
+					</button>
+				</div>
 			</div>
 
 			<Button className='w-full' type='submit'>
@@ -78,11 +118,6 @@ export function LoginForm () {
 					Privacy Policy
 				</Link>
 			</div>
-
-			<SubsidyModal
-				isOpen={showSubsidy}
-				onClose={() => setShowSubsidy(false)}
-			/>
 		</form>
 	)
 }
