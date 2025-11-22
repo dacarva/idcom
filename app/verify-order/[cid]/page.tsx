@@ -25,21 +25,51 @@ export default function VerifyOrderPage() {
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!cid || loaded) return;
 
     const fetchOrder = async () => {
       setVerificationStatus('loading');
-      const result = await retrieveOrder(cid);
+      setError(null);
 
-      if ('success' in result && result.success) {
-        setOrderData(result.order);
-        setVerificationStatus('success');
-      } else {
+      try {
+        // Call decrypt API with CID
+        // Wallet signature and encryption salt are retrieved from Supabase
+        const response = await fetch('/api/orders/decrypt', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cid,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          setError(errorData.error || 'Failed to decrypt order');
+          setVerificationStatus('error');
+          setLoaded(true);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.success && data.order) {
+          setOrderData(data.order);
+          setVerificationStatus('success');
+        } else {
+          setError('Invalid response from server');
+          setVerificationStatus('error');
+        }
+      } catch (err) {
+        console.error('Error fetching order:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
         setVerificationStatus('error');
+      } finally {
+        setLoaded(true);
       }
-      setLoaded(true);
     };
 
     fetchOrder();

@@ -1,10 +1,14 @@
 import lighthouse from '@lighthouse-web3/sdk';
+import { encryptionService } from './encryption.service';
 
 interface UploadResult {
   cid: string;
   ipfsUrl: string;
   fileSize: number;
   uploadedAt: string;
+  encryptionKey?: string;
+  ciphertext?: string;
+  nonce?: string;
 }
 
 interface RetrieveResult {
@@ -31,10 +35,13 @@ class FilecoinService {
   }
 
   /**
-   * Upload order to Filecoin via Lighthouse
+   * Upload order to Filecoin via Lighthouse (with encryption)
    * Creates immutable, permanently stored record on decentralized network
+   * @param orderData - Order data to upload
+   * @param encryptionKey - Optional: base64 encoded encryption key for symmetric encryption
+   *                        If not provided, a new key will be generated
    */
-  async uploadOrder(orderData: Record<string, any>): Promise<UploadResult> {
+  async uploadOrder(orderData: Record<string, any>, encryptionKey?: string): Promise<UploadResult> {
     try {
       if (!this.apiKey) {
         throw new Error('LIGHTHOUSE_API_KEY not configured');
@@ -47,12 +54,30 @@ class FilecoinService {
           timestamp: new Date().toISOString(),
           service: 'Filecoin/Lighthouse',
           version: '1',
+          encrypted: !!encryptionKey,
         },
       };
 
+      // Generate or use provided encryption key
+      let generatedKey = encryptionKey;
+      if (!generatedKey) {
+        generatedKey = encryptionService.generateKey();
+      }
+
+      // Encrypt order data
+      const encryptionResult = encryptionService.encrypt(orderWithMetadata, generatedKey);
+
+      // Prepare encrypted payload
+      const encryptedPayload = {
+        type: 'encrypted_order',
+        ciphertext: encryptionResult.ciphertext,
+        nonce: encryptionResult.nonce,
+        algorithm: 'nacl-secretbox',
+      };
+
       // Convert to JSON
-      const jsonString = JSON.stringify(orderWithMetadata, null, 2);
-      const fileName = `order-${orderData.id || 'unknown'}-${Date.now()}.json`;
+      const jsonString = JSON.stringify(encryptedPayload, null, 2);
+      const fileName = `order-encrypted-${orderData.id || 'unknown'}-${Date.now()}.json`;
 
       // Upload via Lighthouse uploadText (Node.js compatible)
       const response = await lighthouse.uploadText(jsonString, this.apiKey, fileName);
@@ -65,7 +90,7 @@ class FilecoinService {
       const uploadedAt = new Date().toISOString();
       const fileSize = Buffer.byteLength(jsonString, 'utf8');
 
-      console.log(`✅ Order archived on Filecoin`);
+      console.log(`✅ Order archived on Filecoin (encrypted)`);
       console.log(`   CID: ${cid}`);
       console.log(`   Size: ${fileSize} bytes`);
 
@@ -74,6 +99,9 @@ class FilecoinService {
         ipfsUrl: `ipfs://${cid}`,
         fileSize,
         uploadedAt,
+        encryptionKey: generatedKey,
+        ciphertext: encryptionResult.ciphertext,
+        nonce: encryptionResult.nonce,
       };
     } catch (error) {
       console.error('❌ Filecoin upload failed:', error);

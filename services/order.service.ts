@@ -21,6 +21,9 @@ class OrderService {
     paymentMethod: string
     timestamp: string
     cid?: string | null
+    wallet_address?: string
+    wallet_signature?: string
+    encryption_salt?: string
   }): Promise<Order> {
     try {
       const { data, error } = await supabase
@@ -37,6 +40,9 @@ class OrderService {
             shipping_address: orderData.shippingAddress,
             payment_method: orderData.paymentMethod,
             cid: orderData.cid || null,
+            wallet_address: orderData.wallet_address || null,
+            wallet_signature: orderData.wallet_signature || null,
+            encryption_salt: orderData.encryption_salt || null,
             status: 'pending',
             created_at: orderData.timestamp,
             updated_at: new Date().toISOString(),

@@ -183,17 +183,34 @@ export default function CheckoutPage() {
 
       const archiveData = await archiveResponse.json()
       const cid = archiveData.cid || null
+      const walletAddress = archiveData.walletAddress || null
+      const walletSignature = archiveData.walletSignature || null
+      const encryptionSalt = archiveData.encryptionSalt || null
 
-      // Guardar orden completa en localStorage con CID
+      // Guardar orden completa en localStorage con CID y datos de wallet
       const completeOrder = {
         ...orderData,
         id: orderId,
         cid: cid,
+        walletAddress,
+        walletSignature,
+        encryptionSalt,
         archivedAt: cid ? new Date().toISOString() : null,
       }
 
       localStorage.setItem('lastOrder', JSON.stringify(completeOrder))
-      if (cid) {
+      
+      // Guardar wallet signature con CID para acceso posterior
+      if (cid && walletAddress && walletSignature && encryptionSalt) {
+        localStorage.setItem(`order_${cid}`, JSON.stringify({
+          orderId,
+          walletAddress,
+          walletSignature,
+          encryptionSalt,
+          savedAt: new Date().toISOString(),
+        }))
+        console.log(`✅ Order archived to Filecoin (wallet-secured): ${cid}`)
+      } else if (cid) {
         console.log(`✅ Order archived to Filecoin: ${cid}`)
       }
 

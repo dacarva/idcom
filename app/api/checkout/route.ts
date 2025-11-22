@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { filecoinService } from '@/services/filecoin.service'
 import { orderService } from '@/services/order.service'
+import { encryptionService } from '@/services/encryption.service'
+import { walletService } from '@/services/wallet.service'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,13 +31,27 @@ export async function POST(request: NextRequest) {
       timestamp: timestamp || new Date().toISOString(),
     }
 
-    // Archive order to Filecoin
+    // Create wallet signature for order encryption
+    const walletSignature = await walletService.createOrderSignature(
+      `Order ${orderId} - ${orderData.total} USD`
+    )
+    console.log(`🔐 Wallet signature created: ${walletSignature.walletAddress.substring(0, 8)}...`)
+
+    // Derive encryption key from wallet signature
+    const encryptionKey = walletService.deriveEncryptionKey(
+      walletSignature.walletAddress,
+      walletSignature.signature,
+      walletSignature.salt
+    )
+    console.log(`🔑 Encryption key derived from wallet`)
+
+    // Archive order to Filecoin (with encryption)
     let cid: string | null = null
     let archiveResult = null
     
     try {
       if (filecoinService.isConfigured()) {
-        const uploadResult = await filecoinService.uploadOrder(orderData)
+        const uploadResult = await filecoinService.uploadOrder(orderData, encryptionKey)
         cid = uploadResult.cid
         archiveResult = uploadResult
         console.log(`✅ Order archived to Filecoin with CID: ${cid}`)
@@ -47,14 +63,17 @@ export async function POST(request: NextRequest) {
       // Don't fail checkout if Filecoin fails
     }
 
-    // Save order to Supabase database
+    // Save order to Supabase database with wallet signature
     try {
       if (orderService.isConfigured()) {
         await orderService.saveOrder({
           ...orderData,
           cid,
+          wallet_address: walletSignature.walletAddress,
+          wallet_signature: walletSignature.signature,
+          encryption_salt: walletSignature.salt,
         })
-        console.log(`✅ Order saved to Supabase database`)
+        console.log(`✅ Order saved to Supabase database with wallet signature`)
       } else {
         console.warn('⚠️ Supabase not configured, order saved to Filecoin only')
       }
@@ -68,7 +87,10 @@ export async function POST(request: NextRequest) {
         success: true,
         orderId,
         cid,
-        message: cid ? 'Order created and archived to Filecoin' : 'Order created (Filecoin archival skipped)',
+        walletAddress: walletSignature.walletAddress,
+        walletSignature: walletSignature.signature,
+        encryptionSalt: walletSignature.salt,
+        message: cid ? 'Order created and archived to Filecoin (wallet-secured)' : 'Order created (Filecoin archival skipped)',
       },
       { status: 201 }
     )
