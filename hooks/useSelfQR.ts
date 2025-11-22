@@ -72,7 +72,7 @@ export function useSelfQR({
           // issuing_state: true,
           nationality: true, // Required: Contract verifies nationality is COL or PSE
           // date_of_birth: true,
-          // passport_number: false,
+          passport_number: true,
           // gender: true,
           // expiry_date: false,
         },
