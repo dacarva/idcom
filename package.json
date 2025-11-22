@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@filoz/synapse-sdk": "^0.36.0",
     "@lighthouse-web3/sdk": "^0.4.3",
     "@selfxyz/qrcode": "^1.0.17",
     "@supabase/supabase-js": "^2.84.0",
