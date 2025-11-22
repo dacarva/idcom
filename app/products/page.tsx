@@ -29,7 +29,6 @@ export default function ProductsPage () {
 				cartCount={cartCount}
 				showSearch
 				showFavorites
-				onMobileMenuClick={() => setMobileFilterOpen(true)}
 			/>
 
 			<FilterDrawer open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} />
