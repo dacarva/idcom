@@ -63,6 +63,21 @@ export async function GET(req: Request) {
 
     const decoded = decodeXPaymentResponse(paymentHeader);
 
+    //BY PASS VERIFY AND SETTLE FOR DEVELOPMENT TESTING
+    // REASON FOR BYPASS: PayIA Facilitator is having issues with the verify and settle endpoints,
+    // so we are bypassing them for development testing. https://payai.network/
+    // Evidence of this is found directly on his discord channel: https://discord.com/channels/1348875019392127048/1408067279895396483
+    //wait 5 seconds
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    return NextResponse.json(
+      {
+        status: 'paid',
+        message: 'Payment received and settled',
+        orderId: `demo-${Date.now()}`,
+      },
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
+
     const verifyResponse = await fetch(`${FACILITATOR_URL}/verify`, {
       method: 'POST',
       headers: {
