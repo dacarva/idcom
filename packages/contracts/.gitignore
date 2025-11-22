@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Foundry build artifacts
+out/
+cache/
+broadcast/
+
+# Environment files
+.env
+.env.local

@@ -8,7 +8,7 @@ This is a monorepo managed with npm workspaces, containing three main workspaces
 
 1. **apps/ecommerce** - Next.js ecommerce application with refugee subsidy verification
 2. **apps/wallet** - Wallet application (to be added)
-3. **packages/contracts** - Foundry-based smart contracts (to be added)
+3. **packages/contracts** - Foundry-based smart contracts for refugee verification
 
 ```
 idcom/
@@ -16,7 +16,7 @@ idcom/
 │   ├── ecommerce/          # Ecommerce application
 │   └── wallet/             # Wallet application (empty, ready for files)
 ├── packages/
-│   └── contracts/         # Smart contracts (empty, ready for Foundry project)
+│   └── contracts/         # Smart contracts (ProofOfHuman contract)
 ├── .devcontainer/         # Development container configuration
 ├── package.json           # Root workspace configuration
 └── README.md             # This file
@@ -125,12 +125,49 @@ Wallet application (to be added from another repository).
 
 ### packages/contracts
 
-Foundry-based smart contracts for the IDCom platform (to be added from another repository).
+Foundry-based smart contracts for the IDCom platform providing privacy-preserving identity verification for refugee subsidy eligibility.
+
+**Features:**
+- Privacy-preserving identity verification using Self Protocol
+- Age verification (18+)
+- Country restriction enforcement
+- Refugee status tracking and discount eligibility
+- Integration with Self Mobile App
+- Deployed on Celo (testnet and mainnet)
 
 **Technology:**
 - Foundry for development and testing
-- Solidity smart contracts
+- Solidity smart contracts (Solidity 0.8.28)
+- Self Protocol SDK integration
+- OpenZeppelin contracts
 - Celo Sepolia network deployment
+
+**Main Contract:**
+- `ProofOfHuman` - Extends `SelfVerificationRoot` to verify users through passport-based attestations without revealing sensitive personal information on-chain
+
+**Usage:**
+```bash
+# Build contracts
+npm run build:contracts
+
+# Test contracts
+npm run test:contracts
+
+# Lint contracts
+npm run lint:contracts
+
+# Or run from contracts directory
+cd packages/contracts
+forge build
+forge test
+npm run lint
+```
+
+**Network Configuration:**
+- **Celo Sepolia (Testnet)**: `https://forno.celo-sepolia.celo-testnet.org`
+- **Celo Mainnet**: `https://forno.celo.org`
+
+See `packages/contracts/README.md` for detailed contract documentation.
 
 ## Adding Files from Another Repository
 
@@ -202,6 +239,7 @@ npm run build:contracts
 - `npm run lint` - Lint ecommerce app
 - `npm run lint:ecommerce` - Lint ecommerce app
 - `npm run lint:wallet` - Lint wallet app
+- `npm run lint:contracts` - Lint smart contracts
 - `npm run test:contracts` - Test smart contracts
 
 ## Learn More

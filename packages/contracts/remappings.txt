@@ -1,0 +1,4 @@
+forge-std/=lib/forge-std/src/
+@selfxyz/contracts/=node_modules/@selfxyz/contracts/
+@openzeppelin/=lib/openzeppelin-contracts/
+risc0/=lib/risc0/
