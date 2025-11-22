@@ -66,13 +66,14 @@ export function useVerifierEvents(): UseVerifierEventsReturn {
         // Get the most recent event
         const latestEvent = events[events.length - 1]
         
-        if (latestEvent.args) {
+        // Type guard: check if it's an EventLog with args property
+        if ('args' in latestEvent && latestEvent.args && Array.isArray(latestEvent.args) && latestEvent.args.length >= 5) {
           const eventData: RefugeeDiscountEligibilityEvent = {
-            passportHash: latestEvent.args[0] as string,
-            nationality: latestEvent.args[1] as string,
-            isEligibleNationality: latestEvent.args[2] as boolean,
-            isRefugee: latestEvent.args[3] as boolean,
-            isEligibleForDiscount: latestEvent.args[4] as boolean,
+            passportHash: String(latestEvent.args[0]),
+            nationality: String(latestEvent.args[1]),
+            isEligibleNationality: Boolean(latestEvent.args[2]),
+            isRefugee: Boolean(latestEvent.args[3]),
+            isEligibleForDiscount: Boolean(latestEvent.args[4]),
             blockNumber: latestEvent.blockNumber,
             transactionHash: latestEvent.transactionHash,
           }
