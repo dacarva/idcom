@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { AppHeader } from '@/components/layout/app-header'
 import { useCartStore } from '@/stores/cart-store'
 import { Button } from '@/components/ui/button'
 
@@ -10,11 +11,18 @@ export default function CartPage () {
 	const getSubtotal = useCartStore((state) => state.getSubtotal)
 	const updateQuantity = useCartStore((state) => state.updateQuantity)
 	const removeItem = useCartStore((state) => state.removeItem)
+	const getCount = useCartStore((state) => state.getCount)
 
-	 const [mounted, setMounted] = useState(false)
+	const [mounted, setMounted] = useState(false)
+	const [cartCount, setCartCount] = useState(0)
 
 	useEffect(() => {
 		setMounted(true)
+		setCartCount(getCount())
+		const unsubscribe = useCartStore.subscribe(
+			() => setCartCount(getCount()),
+		)
+		return unsubscribe
 	}, [])
 
 	if (!mounted) {
@@ -28,51 +36,9 @@ export default function CartPage () {
 
 	return (
 		<div className='flex min-h-screen w-full flex-col'>
-			{/* Header */}
-			<header className='sticky top-0 z-10 w-full border-b border-gray-200
-				bg-white/80 backdrop-blur-sm'>
-				<div className='container mx-auto px-4'>
-					<div className='flex h-16 items-center justify-between'>
-						<Link
-							href='/'
-							className='flex items-center gap-4 text-gray-900'
-						>
-							<span className='text-2xl'>🍃</span>
-							<h2 className='text-lg font-bold tracking-tight'>
-								Essentials Subsidy
-							</h2>
-						</Link>
-
-						<nav className='hidden items-center gap-8 md:flex'>
-							<Link href='/products'
-								className='text-sm font-medium hover:text-green-600'>
-								Continue Shopping
-							</Link>
-							<a href='#'
-								className='text-sm font-medium hover:text-green-600'>
-								Categories
-							</a>
-							<a href='#'
-								className='text-sm font-medium hover:text-green-600'>
-								Help
-							</a>
-						</nav>
-
-						<div className='flex items-center gap-3'>
-						<Link href='/cart'>
-							<button className='flex h-10 w-10 items-center
-								justify-center rounded-full bg-green-100
-								text-green-600'>
-								🛒
-							</button>
-						</Link>
-							<div className='ml-2 h-10 w-10 rounded-full
-								bg-gradient-to-br from-green-300 to-green-500'>
-							</div>
-						</div>
-					</div>
-				</div>
-			</header>
+			<AppHeader
+				cartCount={cartCount}
+			/>
 
 			{/* Main */}
 			<main className='flex-grow'>

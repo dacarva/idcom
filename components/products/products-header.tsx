@@ -12,7 +12,7 @@ export function ProductsHeader ({ cartCount, onMobileFilterClick }: ProductsHead
 			<div className='flex items-center gap-3'>
 				<span className='text-3xl text-primary'>🍃</span>
 				<h1 className='text-xl font-bold text-text-light'>
-					Idcommerce
+					idcom
 				</h1>
 			</div>
 

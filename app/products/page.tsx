@@ -1,7 +1,7 @@
 'use client'
 
 import { FABBar } from '@/components/mobile/fab-bar'
-import { ProductsHeader } from '@/components/products/products-header'
+import { AppHeader } from '@/components/layout/app-header'
 import { FilterDrawer } from '@/components/products/filter-drawer'
 import { FilterSidebar } from '@/components/products/filter-sidebar'
 import { ProductsBanner } from '@/components/products/products-banner'
@@ -23,9 +23,21 @@ export default function ProductsPage () {
 		return unsubscribe
 	}, [])
 
+	const navItems = [
+		{ label: 'Home', href: '#' },
+		{ label: 'My Orders', href: '#' },
+	]
+
 	return (
 		<div className='relative flex min-h-screen w-full flex-col'>
-			<ProductsHeader cartCount={cartCount} onMobileFilterClick={() => setMobileFilterOpen(true)} />
+			<AppHeader
+				cartCount={cartCount}
+				showSearch
+				showNav
+				showFavorites
+				onMobileMenuClick={() => setMobileFilterOpen(true)}
+				navItems={navItems}
+			/>
 
 			<FilterDrawer open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} />
 
@@ -51,7 +63,7 @@ export default function ProductsPage () {
 			<footer className='border-t border-border-light mt-12 px-4 py-8 sm:px-8 md:px-10 lg:px-20'>
 				<div className='flex flex-col items-center justify-between gap-4 md:flex-row'>
 					<p className='text-sm text-text-light/70'>
-						© 2024 Idcommerce. All rights reserved.
+						© 2024 idcom. All rights reserved.
 					</p>
 					<div className='flex gap-6'>
 						<a href='#' className='text-sm font-medium hover:text-primary transition-colors'>
