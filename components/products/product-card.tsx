@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useCartStore } from '@/stores/cart-store'
 import { useFavoritesStore } from '@/stores/favorites-store'
+import { useUserStore } from '@/stores/user-store'
 
 interface ProductCardProps {
 	id: string
@@ -19,9 +20,14 @@ export function ProductCard (props: ProductCardProps) {
 	const addItem = useCartStore((state) => state.addItem)
 	const isFavorite = useFavoritesStore((state) => state.isFavorite)
 	const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite)
+	const userHasSubsidy = useUserStore((state) => state.user?.hasSubsidy ?? false)
 
 	const [mounted, setMounted] = useState(false)
 	const [isFav, setIsFav] = useState(false)
+
+	// Determine which price to show
+	const displayPrice = userHasSubsidy ? discountedPrice : price
+	const originalPrice = userHasSubsidy ? price : null
 
 	useEffect(() => {
 		setMounted(true)
@@ -86,11 +92,13 @@ export function ProductCard (props: ProductCardProps) {
 			<div className='flex flex-col gap-2 mt-auto'>
 				<div className='flex items-baseline gap-2'>
 					<span className='text-2xl font-bold text-primary'>
-						${discountedPrice.toFixed(2)}
+						${displayPrice.toFixed(2)}
 					</span>
-					<span className='text-sm text-text-light/60 line-through'>
-						${price.toFixed(2)}
-					</span>
+					{originalPrice && (
+						<span className='text-sm text-text-light/60 line-through'>
+							${originalPrice.toFixed(2)}
+						</span>
+					)}
 				</div>
 
 				{/* Add to Cart Button */}
