@@ -23,20 +23,13 @@ export default function ProductsPage () {
 		return unsubscribe
 	}, [])
 
-	const navItems = [
-		{ label: 'Home', href: '#' },
-		{ label: 'My Orders', href: '#' },
-	]
-
 	return (
 		<div className='relative flex min-h-screen w-full flex-col'>
 			<AppHeader
 				cartCount={cartCount}
 				showSearch
-				showNav
 				showFavorites
 				onMobileMenuClick={() => setMobileFilterOpen(true)}
-				navItems={navItems}
 			/>
 
 			<FilterDrawer open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} />
