@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { FiInfo } from 'react-icons/fi'
 import { AppHeader } from '@/components/layout/app-header'
 import { Breadcrumb } from '@/components/layout/breadcrumb'
 import { useCartStore } from '@/stores/cart-store'
@@ -205,10 +206,10 @@ export default function CartPage () {
 												<span className='text-gray-600'>
 													30% Subsidy
 												</span>
-												<span title='Discount for eligible users.'
-													className='text-gray-400 cursor-help'>
-													ℹ️
-												</span>
+												<FiInfo
+													title='Discount for eligible users.'
+													className='text-gray-400 cursor-help w-4 h-4'
+												/>
 											</div>
 											<span className='font-medium
 												text-green-600'>
