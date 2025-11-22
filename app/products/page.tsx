@@ -24,7 +24,7 @@ export default function ProductsPage () {
 	}, [])
 
 	return (
-		<div className='relative flex min-h-screen w-full flex-col bg-background-light'>
+		<div className='relative flex min-h-screen w-full flex-col'>
 			<ProductsHeader cartCount={cartCount} onMobileFilterClick={() => setMobileFilterOpen(true)} />
 
 			<FilterDrawer open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)} />

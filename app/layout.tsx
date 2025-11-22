@@ -24,7 +24,7 @@ export default function RootLayout (
 ) {
 	return (
 		<html lang='es' className='light'>
-			<body className={plusJakarta.className}>
+			<body className={`${plusJakarta.className} bg-background-light`}>
 				<main role='main'>{children}</main>
 			</body>
 		</html>

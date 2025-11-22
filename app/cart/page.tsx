@@ -27,7 +27,7 @@ export default function CartPage () {
 	const total = subtotal - subsidy + shipping
 
 	return (
-		<div className='flex min-h-screen w-full flex-col bg-white'>
+		<div className='flex min-h-screen w-full flex-col'>
 			{/* Header */}
 			<header className='sticky top-0 z-10 w-full border-b border-gray-200
 				bg-white/80 backdrop-blur-sm'>
