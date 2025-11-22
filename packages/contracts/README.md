@@ -193,6 +193,7 @@ $ cast --help
 - **RPC**: `https://forno.celo-sepolia.celo-testnet.org`
 - **Explorer**: `https://celo-sepolia.blockscout.com/`
 - **Use for**: Testing with mock passports
+- **Deployed ProofOfHuman Contract**: [`0x1604DfD862fe11519641b6477bdd15a2eA622403`](https://celo-sepolia.blockscout.com/address/0x1604DfD862fe11519641b6477bdd15a2eA622403)
 
 ### Celo Mainnet
 - **Hub Address**: `0xe57F4773bd9c9d8b6Cd70431117d353298B9f5BF`

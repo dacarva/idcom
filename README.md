@@ -110,7 +110,7 @@ Next.js ecommerce application that integrates with blockchain-based identity ver
 **Environment Variables:**
 Create `apps/ecommerce/.env.local`:
 ```env
-NEXT_PUBLIC_SELF_ENDPOINT=<Verifier contract address on Celo Sepolia>
+NEXT_PUBLIC_SELF_ENDPOINT=0x1604DfD862fe11519641b6477bdd15a2eA622403
 NEXT_PUBLIC_SELF_ENDPOINT_TYPE=staging_celo
 NEXT_PUBLIC_SELF_APP_NAME=idcom
 NEXT_PUBLIC_SELF_SCOPE_SEED=idcom-subsidy
@@ -166,6 +166,9 @@ npm run lint
 **Network Configuration:**
 - **Celo Sepolia (Testnet)**: `https://forno.celo-sepolia.celo-testnet.org`
 - **Celo Mainnet**: `https://forno.celo.org`
+
+**Deployed Contract:**
+- **ProofOfHuman Contract (Celo Sepolia)**: [`0x1604DfD862fe11519641b6477bdd15a2eA622403`](https://celo-sepolia.blockscout.com/address/0x1604DfD862fe11519641b6477bdd15a2eA622403)
 
 See `packages/contracts/README.md` for detailed contract documentation.
 
