@@ -1,11 +1,11 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { useUserStore } from '@/stores/user-store'
 import { useSelfQR } from '@/hooks/useSelfQR'
+import { useVerifierEvents } from '@/hooks/useVerifierEvents'
 import { useToastNotification, ToastNotification } from '@/components/ui/toast'
 import { CopyableLink } from '@/components/ui/copyable-link'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
@@ -24,12 +24,79 @@ export default function VerifySubsidyPage() {
   const skipSubsidyVerification = useUserStore((state) => state.skipSubsidyVerification)
   const isVerified = user?.hasSubsidy ?? false
   const { toast, success: showSuccess, error: showError } = useToastNotification()
+  const [isPollingEvents, setIsPollingEvents] = useState(false)
+  const processedEventRef = useRef<string | null>(null)
+  
+  const {
+    eligibilityEvent,
+    error: eventError,
+    startPolling,
+    stopPolling,
+  } = useVerifierEvents()
+
+  const handleVerifySubsidy = () => {
+    // Custom logic before verification
+    console.log('Starting subsidy verification process...')
+    console.log('Polling for RefugeeDiscountEligibility events on Celo Sepolia...')
+    
+    // Start polling for events
+    setIsPollingEvents(true)
+    startPolling()
+  }
+
+  // Handle when eligibility event is found
+  useEffect(() => {
+    if (!eligibilityEvent) return
+    
+    // Prevent processing the same event twice
+    const eventKey = `${eligibilityEvent.transactionHash}-${eligibilityEvent.blockNumber}`
+    if (processedEventRef.current === eventKey) return
+    processedEventRef.current = eventKey
+
+    console.log('RefugeeDiscountEligibility event found:', eligibilityEvent)
+    
+    if (eligibilityEvent.isEligibleForDiscount) {
+      // User is eligible for discount
+      verifySubsidy()
+      showSuccess('Subsidy verified successfully! You are eligible for the discount.')
+      console.log('Subsidy verification completed for user:', user?.email)
+    } else {
+      // User is not eligible for discount
+      skipSubsidyVerification()
+      showError('You are not eligible for the subsidy discount.')
+      console.log('User is not eligible for subsidy:', user?.email)
+    }
+    
+    // Stop polling
+    stopPolling()
+    
+    // Update state and redirect asynchronously using queueMicrotask
+    queueMicrotask(() => {
+      setIsPollingEvents(false)
+      setTimeout(() => {
+        router.push('/products')
+      }, 1500)
+    })
+  }, [eligibilityEvent, verifySubsidy, skipSubsidyVerification, showSuccess, showError, router, user?.email, stopPolling])
+
+  // Handle event polling errors
+  useEffect(() => {
+    if (!eventError || !isPollingEvents) return
+
+    console.error('Error polling for events:', eventError)
+    showError('Failed to verify subsidy eligibility. Please try again.')
+    stopPolling()
+    
+    queueMicrotask(() => {
+      setIsPollingEvents(false)
+    })
+  }, [eventError, isPollingEvents, showError, stopPolling])
 
   const { selfApp, isLoading: qrLoading, universalLink, error: qrError } = useSelfQR({
     userId: user?.id || '',
     userDefinedData: `Subsidy verification for ${user?.email}`,
     onSuccess: () => {
-      verifySubsidy()
+      handleVerifySubsidy()
     },
   })
 
@@ -42,11 +109,6 @@ export default function VerifySubsidyPage() {
       router.push('/login')
     }
   }, [isLoggedIn, router])
-
-  const handleVerifyQR = () => {
-    verifySubsidy()
-    router.push('/products')
-  }
 
   const handleSkip = () => {
     skipSubsidyVerification()
@@ -82,7 +144,7 @@ export default function VerifySubsidyPage() {
               <SelfQRcodeWrapper
                 selfApp={selfApp}
                 onSuccess={() => {
-                  verifySubsidy()
+                  handleVerifySubsidy()
                 }}
                 onError={() => {
                   console.error('Error verifying with Self Protocol')
@@ -104,14 +166,22 @@ export default function VerifySubsidyPage() {
           )}
 
           <p className="text-sm text-[#0d1b0d] text-center mb-4">
-            {isVerified ? 'Enjoy your exclusive discount on eligible products!' : 'Point your camera at the QR code to verify your subsidy eligibility'}
+            {isVerified 
+              ? 'Enjoy your exclusive discount on eligible products!' 
+              : isPollingEvents 
+                ? 'Checking blockchain for verification status...' 
+                : 'Point your camera at the QR code to verify your subsidy eligibility'}
           </p>
 
           {!isVerified && (
             <div className="w-full max-w-xs flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary/10 text-[#0d1b0d] text-sm font-bold leading-normal tracking-[0.015em] mx-auto">
               <div className="flex items-center gap-2">
                 <AiOutlineLoading3Quarters className="w-5 h-5 text-primary animate-spin" />
-                <span>Waiting for QR Scan</span>
+                <span>
+                  {isPollingEvents 
+                    ? 'Verifying eligibility on blockchain...' 
+                    : 'Waiting for QR Scan'}
+                </span>
               </div>
             </div>
           )}
