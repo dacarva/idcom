@@ -1,5 +1,5 @@
-import lighthouse from '@lighthouse-web3/sdk';
 import { encryptionService } from './encryption.service';
+import { filecoinSynapseService } from './filecoin-synapse.service';
 
 interface UploadResult {
   cid: string;
@@ -79,20 +79,23 @@ class FilecoinService {
       const jsonString = JSON.stringify(encryptedPayload, null, 2);
       const fileName = `order-encrypted-${orderData.id || 'unknown'}-${Date.now()}.json`;
 
-      // Upload via Lighthouse uploadText (Node.js compatible)
-      const response = await lighthouse.uploadText(jsonString, this.apiKey, fileName);
-
-      if (!response.data?.Hash) {
-        throw new Error('Invalid Lighthouse response: missing Hash/CID');
-      }
-
-      const cid = response.data.Hash;
+      // Upload via Synapse SDK with wallet (Calibration Testnet)
       const uploadedAt = new Date().toISOString();
       const fileSize = Buffer.byteLength(jsonString, 'utf8');
+      
+      const synapseResult = await filecoinSynapseService.uploadOrderToFilecoin(
+        orderWithMetadata,
+        encryptionResult.ciphertext
+      );
+      const cid = synapseResult.cid;
 
-      console.log(`✅ Order archived on Filecoin (encrypted)`);
+      console.log(`✅ Order archived on Filecoin (Calibration Testnet)`);
       console.log(`   CID: ${cid}`);
-      console.log(`   Size: ${fileSize} bytes`);
+      console.log(`   Encrypted: true`);
+      console.log(`   Wallet: ${filecoinSynapseService.getWalletAddress()}`);
+      if (synapseResult.transactionHash) {
+        console.log(`   TX: ${synapseResult.transactionHash}`);
+      }
 
       return {
         cid,
@@ -111,30 +114,16 @@ class FilecoinService {
 
   /**
    * Retrieve order from Filecoin by CID
-   * Verifies data integrity and returns immutable order record
+   * Uses Synapse SDK on Calibration Testnet
    */
   async retrieveOrder(cid: string): Promise<RetrieveResult> {
     try {
-      const url = `${this.gatewayUrl}/${cid}`;
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Gateway returned ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const retrievedAt = new Date().toISOString();
-
+      const synapseResult = await filecoinSynapseService.retrieveOrderFromFilecoin(cid);
       console.log(`✅ Order retrieved from Filecoin (CID: ${cid.substring(0, 8)}...)`);
-
       return {
         cid,
-        data,
-        retrievedAt,
+        data: synapseResult.data,
+        retrievedAt: synapseResult.retrievedAt,
       };
     } catch (error) {
       console.error('❌ Filecoin retrieval failed:', error);

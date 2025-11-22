@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.84.0",
     "dotenv": "^17.2.3",
     "ethers": "^6.15.0",
+    "filecoin-pin": "^0.13.0",
     "next": "16.0.3",
     "qrcode.react": "^1.0.1",
     "react": "19.2.0",
