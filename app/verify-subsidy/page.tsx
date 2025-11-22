@@ -4,8 +4,12 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useUserStore } from '@/stores/user-store'
+import { useSelfQR } from '@/hooks/useSelfQR'
+import { useToastNotification, ToastNotification } from '@/components/ui/toast'
+import { CopyableLink } from '@/components/ui/copyable-link'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { MdEmojiEmotions } from 'react-icons/md'
+import { SelfQRcodeWrapper } from '@selfxyz/qrcode'
 
 export default function VerifySubsidyPage() {
   const router = useRouter()
@@ -14,6 +18,15 @@ export default function VerifySubsidyPage() {
   const verifySubsidy = useUserStore((state) => state.verifySubsidy)
   const skipSubsidyVerification = useUserStore((state) => state.skipSubsidyVerification)
   const isVerified = user?.hasSubsidy ?? false
+  const { toast, success: showSuccess, error: showError } = useToastNotification()
+
+  const { selfApp, isLoading: qrLoading, universalLink } = useSelfQR({
+    userId: user?.id || '',
+    userDefinedData: `Subsidy verification for ${user?.email}`,
+    onSuccess: () => {
+      verifySubsidy()
+    },
+  })
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -33,6 +46,7 @@ export default function VerifySubsidyPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9F7] flex items-center justify-center px-4">
+      <ToastNotification toast={toast} />
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-12">
@@ -46,57 +60,37 @@ export default function VerifySubsidyPage() {
 
         {/* Content Container */}
         <div className="bg-white rounded-xl border border-[#e7f3e7] p-8 mb-8 flex flex-col items-center">
-          {isVerified ? (
+        {isVerified ? (
             <div className="w-full max-w-xs aspect-square bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border-2 border-dashed border-primary flex items-center justify-center mb-6">
               <MdEmojiEmotions className="w-32 h-32 text-primary" />
             </div>
+          ) : qrLoading ? (
+            <div className="w-[256px] h-[256px] bg-gray-100 rounded-lg border-2 border-dashed border-[#cfe7cf] flex items-center justify-center mb-6 animate-pulse">
+              <p className="text-gray-500 text-sm">Loading QR Code...</p>
+            </div>
+          ) : selfApp ? (
+            <div className="mb-6 flex flex-col items-center gap-4 w-full max-w-xs">
+              <SelfQRcodeWrapper
+                selfApp={selfApp}
+                onSuccess={() => {
+                  verifySubsidy()
+                }}
+                onError={() => {
+                  console.error('Error verifying with Self Protocol')
+                }}
+              />
+              {universalLink && (
+                <CopyableLink
+                  link={universalLink}
+                  label="Verification link"
+                  onCopySuccess={() => showSuccess('Verification link copied!')}
+                  onCopyError={() => showError('Failed to copy link')}
+                />
+              )}
+            </div>
           ) : (
-            <div className="w-full max-w-xs aspect-square bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg border-2 border-dashed border-[#cfe7cf] flex items-center justify-center mb-6 relative overflow-hidden">
-              {/* Visual QR Code Representation */}
-              <svg
-                className="w-full h-full p-8 text-[#4c9a4c]"
-                viewBox="0 0 200 200"
-                fill="currentColor"
-              >
-                {/* QR Pattern */}
-                <rect x="20" y="20" width="20" height="20" />
-                <rect x="40" y="20" width="20" height="20" />
-                <rect x="60" y="20" width="20" height="20" />
-                <rect x="80" y="20" width="20" height="20" />
-                <rect x="100" y="20" width="20" height="20" />
-                <rect x="120" y="20" width="20" height="20" />
-                <rect x="140" y="20" width="20" height="20" />
-                <rect x="160" y="20" width="20" height="20" />
-
-                <rect x="20" y="40" width="20" height="20" />
-                <rect x="160" y="40" width="20" height="20" />
-                <rect x="50" y="50" width="20" height="20" />
-                <rect x="80" y="60" width="20" height="20" />
-                <rect x="120" y="50" width="20" height="20" />
-
-                <rect x="20" y="80" width="20" height="20" />
-                <rect x="40" y="90" width="20" height="20" />
-                <rect x="80" y="100" width="20" height="20" />
-                <rect x="140" y="80" width="20" height="20" />
-                <rect x="160" y="100" width="20" height="20" />
-
-                <rect x="20" y="140" width="20" height="20" />
-                <rect x="40" y="140" width="20" height="20" />
-                <rect x="60" y="140" width="20" height="20" />
-                <rect x="80" y="140" width="20" height="20" />
-                <rect x="100" y="140" width="20" height="20" />
-                <rect x="120" y="140" width="20" height="20" />
-                <rect x="140" y="140" width="20" height="20" />
-                <rect x="160" y="140" width="20" height="20" />
-
-                <rect x="20" y="160" width="20" height="20" />
-                <rect x="160" y="160" width="20" height="20" />
-                <rect x="50" y="170" width="20" height="20" />
-                <rect x="120" y="170" width="20" height="20" />
-              </svg>
-
-              {/* Scanning Line Animation */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 animate-pulse" />
+            <div className="w-[256px] h-[256px] bg-red-100 rounded-lg border-2 border-dashed border-red-300 flex items-center justify-center mb-6">
+              <p className="text-red-600 text-sm">Failed to load QR code</p>
             </div>
           )}
 
