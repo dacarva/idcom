@@ -154,9 +154,11 @@ export default function CheckoutPage() {
     setIsProcessing(true)
 
     try {
-      // Guardar orden en localStorage temporalmente
-      const order = {
-        id: `ORDER-${Date.now()}`,
+      // Crear datos de orden
+      const orderId = `ORDER-${Date.now()}`
+      const orderData = {
+        orderId,
+        userId: user?.id || 'anonymous',
         items: items,
         shippingAddress: shippingAddress,
         paymentMethod: paymentMethod,
@@ -164,22 +166,53 @@ export default function CheckoutPage() {
         subsidy: subsidy,
         shipping: shipping,
         total: total,
-        date: new Date().toISOString(),
+        timestamp: new Date().toISOString(),
       }
 
-      localStorage.setItem('lastOrder', JSON.stringify(order))
+      // Archivar orden a Filecoin y obtener CID
+      console.log('📦 Archiving order to Filecoin...')
+      const archiveResponse = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      })
+
+      if (!archiveResponse.ok) {
+        throw new Error('Failed to process order')
+      }
+
+      const archiveData = await archiveResponse.json()
+      const cid = archiveData.cid || null
+
+      // Guardar orden completa en localStorage con CID
+      const completeOrder = {
+        ...orderData,
+        id: orderId,
+        cid: cid,
+        archivedAt: cid ? new Date().toISOString() : null,
+      }
+
+      localStorage.setItem('lastOrder', JSON.stringify(completeOrder))
+      if (cid) {
+        console.log(`✅ Order archived to Filecoin: ${cid}`)
+      }
 
       // Limpiar carrito
       clear()
 
-      // Generar link de pago llamando a la API local
-      const response = await fetch(`/api/checkout?amount=${total.toFixed(2)}`)
+      // Generar link de pago
+      const paymentResponse = await fetch(`/api/checkout?amount=${total.toFixed(2)}`)
       
-      if (!response.ok) {
+      if (!paymentResponse.ok) {
         throw new Error('Failed to generate payment link')
       }
       
-      const paymentData = await response.json()
+      const paymentData = await paymentResponse.json()
+      
+      // Guardar CID para redirigir después del pago
+      if (cid) {
+        sessionStorage.setItem('orderCid', cid)
+      }
       
       // Redirigir a link de pago
       if (paymentData.paymentLink) {

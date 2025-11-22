@@ -21,14 +21,15 @@ interface OrderData {
 export default function VerifyOrderPage() {
   const params = useParams();
   const cid = params?.cid as string;
-  const { retrieveOrder, isLoading, error } = useFilecoinArchive();
+  const { retrieveOrder } = useFilecoinArchive();
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      if (!cid) return;
+    if (!cid || loaded) return;
 
+    const fetchOrder = async () => {
       setVerificationStatus('loading');
       const result = await retrieveOrder(cid);
 
@@ -38,10 +39,11 @@ export default function VerifyOrderPage() {
       } else {
         setVerificationStatus('error');
       }
+      setLoaded(true);
     };
 
     fetchOrder();
-  }, [cid, retrieveOrder]);
+  }, [cid, loaded]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">

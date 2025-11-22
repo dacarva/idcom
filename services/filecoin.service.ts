@@ -52,15 +52,10 @@ class FilecoinService {
 
       // Convert to JSON
       const jsonString = JSON.stringify(orderWithMetadata, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const file = new File(
-        [blob],
-        `order-${orderData.id || 'unknown'}-${Date.now()}.json`,
-        { type: 'application/json' }
-      );
+      const fileName = `order-${orderData.id || 'unknown'}-${Date.now()}.json`;
 
-      // Upload via Lighthouse
-      const response = await lighthouse.upload(file, this.apiKey);
+      // Upload via Lighthouse uploadText (Node.js compatible)
+      const response = await lighthouse.uploadText(jsonString, this.apiKey, fileName);
 
       if (!response.data?.Hash) {
         throw new Error('Invalid Lighthouse response: missing Hash/CID');
@@ -68,15 +63,16 @@ class FilecoinService {
 
       const cid = response.data.Hash;
       const uploadedAt = new Date().toISOString();
+      const fileSize = Buffer.byteLength(jsonString, 'utf8');
 
       console.log(`✅ Order archived on Filecoin`);
       console.log(`   CID: ${cid}`);
-      console.log(`   Size: ${file.size} bytes`);
+      console.log(`   Size: ${fileSize} bytes`);
 
       return {
         cid,
         ipfsUrl: `ipfs://${cid}`,
-        fileSize: file.size,
+        fileSize,
         uploadedAt,
       };
     } catch (error) {
