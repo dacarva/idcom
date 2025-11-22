@@ -47,6 +47,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [paymentLink, setPaymentLink] = useState<string | null>(null)
   const [showPaymentLink, setShowPaymentLink] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -101,7 +102,7 @@ export default function CheckoutPage() {
       !shippingAddress.city ||
       !shippingAddress.postalCode
     ) {
-      alert('Please complete all address fields')
+      showError('Please complete all address fields')
       return
     }
 
@@ -116,7 +117,7 @@ export default function CheckoutPage() {
       if (!data.paymentLink) throw new Error('No payment link returned')
     } catch (error) {
       console.error('Error generating payment link:', error)
-      alert('An error occurred while generating the payment link. Please try again.')
+      showError('An error occurred while generating the payment link. Please try again.')
     } finally {
       setIsProcessing(false)
     }
@@ -125,8 +126,14 @@ export default function CheckoutPage() {
   const handleCopyToClipboard = () => {
     if (paymentLink) {
       navigator.clipboard.writeText(paymentLink)
-      alert('Payment link copied to clipboard!')
+      setToast({ message: 'Payment link copied to clipboard!', type: 'success' })
+      setTimeout(() => setToast(null), 3000)
     }
+  }
+
+  const showError = (message: string) => {
+    setToast({ message, type: 'error' })
+    setTimeout(() => setToast(null), 3000)
   }
 
   const handleConfirmPayment = async () => {
@@ -138,7 +145,7 @@ export default function CheckoutPage() {
       !shippingAddress.city ||
       !shippingAddress.postalCode
     ) {
-      alert('Please complete all address fields')
+      showError('Please complete all address fields')
       return
     }
 
@@ -180,13 +187,25 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Error processing payment:', error)
-      alert('An error occurred while processing the payment. Please try again.')
+      showError('An error occurred while processing the payment. Please try again.')
       setIsProcessing(false)
     }
   }
 
   return (
     <div className="min-h-screen bg-[#F7F9F7]">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
+          <div
+            className={`rounded-lg px-4 py-3 text-white font-medium shadow-lg ${
+              toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          >
+            {toast.message}
+          </div>
+        </div>
+      )}
       <AppHeader cartCount={cartCount} />
 
       <main className="flex-1 w-full">
@@ -486,12 +505,12 @@ export default function CheckoutPage() {
                             readOnly
                             className="flex-1 bg-white border border-[#cfe7cf] rounded px-3 py-2 text-sm text-[#0d1b0d]"
                           />
-                          <button
-                            onClick={handleCopyToClipboard}
-                            className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#0d1b0d] text-sm font-bold hover:opacity-90 transition-opacity"
-                          >
-                            Copy
-                          </button>
+                      <button
+                        onClick={handleCopyToClipboard}
+                        className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#0d1b0d] text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
+                      >
+                        Copy Link
+                      </button>
                         </div>
                       </div>
                       <button
