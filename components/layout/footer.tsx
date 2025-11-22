@@ -3,7 +3,7 @@ import Link from 'next/link'
 export function Footer () {
 	return (
 		<footer className='w-full p-6 text-center'>
-			<nav aria-label='Enlaces de pie'>
+			<nav aria-label='Footer links'>
 				<ul className='flex flex-col items-center justify-center gap-4
 					@[480px]:flex-row @[480px]:gap-8'>
 					<li>
@@ -12,7 +12,7 @@ export function Footer () {
 							className='text-sm text-text-light/70 hover:text-primary
 								dark:text-text-dark/70 dark:hover:text-primary'
 						>
-							Sobre Nosotros
+							About Us
 						</Link>
 					</li>
 					<li>
@@ -21,7 +21,7 @@ export function Footer () {
 							className='text-sm text-text-light/70 hover:text-primary
 								dark:text-text-dark/70 dark:hover:text-primary'
 						>
-							Ayuda
+							Support
 						</Link>
 					</li>
 					<li>
@@ -30,7 +30,7 @@ export function Footer () {
 							className='text-sm text-text-light/70 hover:text-primary
 								dark:text-text-dark/70 dark:hover:text-primary'
 						>
-							Términos de Servicio
+							Terms of Service
 						</Link>
 					</li>
 				</ul>
