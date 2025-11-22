@@ -45,6 +45,8 @@ export default function CheckoutPage() {
   })
 
   const [isProcessing, setIsProcessing] = useState(false)
+  const [paymentLink, setPaymentLink] = useState<string | null>(null)
+  const [showPaymentLink, setShowPaymentLink] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -91,6 +93,42 @@ export default function CheckoutPage() {
     }))
   }
 
+  const handleGeneratePaymentLink = async () => {
+    if (
+      !shippingAddress.firstName ||
+      !shippingAddress.lastName ||
+      !shippingAddress.address ||
+      !shippingAddress.city ||
+      !shippingAddress.postalCode
+    ) {
+      alert('Please complete all address fields')
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      const response = await fetch(`/api/checkout?amount=${total.toFixed(2)}`)
+      if (!response.ok) throw new Error('Failed to generate payment link')
+      const data = await response.json()
+      setPaymentLink(data.paymentLink || null)
+      setShowPaymentLink(true)
+      if (!data.paymentLink) throw new Error('No payment link returned')
+    } catch (error) {
+      console.error('Error generating payment link:', error)
+      alert('An error occurred while generating the payment link. Please try again.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleCopyToClipboard = () => {
+    if (paymentLink) {
+      navigator.clipboard.writeText(paymentLink)
+      alert('Payment link copied to clipboard!')
+    }
+  }
+
   const handleConfirmPayment = async () => {
     // Validar que los campos requeridos estén completos
     if (
@@ -100,16 +138,13 @@ export default function CheckoutPage() {
       !shippingAddress.city ||
       !shippingAddress.postalCode
     ) {
-      alert('Por favor completa todos los campos de dirección')
+      alert('Please complete all address fields')
       return
     }
 
     setIsProcessing(true)
 
-    // Simular procesamiento de pago
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
       // Guardar orden en localStorage temporalmente
       const order = {
         id: `ORDER-${Date.now()}`,
@@ -128,12 +163,24 @@ export default function CheckoutPage() {
       // Limpiar carrito
       clear()
 
-      // Redirigir a página de confirmación
-      router.push('/order-confirmation')
+      // Generar link de pago llamando a la API local
+      const response = await fetch(`/api/checkout?amount=${total.toFixed(2)}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate payment link')
+      }
+      
+      const paymentData = await response.json()
+      
+      // Redirigir a link de pago
+      if (paymentData.paymentLink) {
+        window.location.href = paymentData.paymentLink
+      } else {
+        throw new Error('No payment link returned')
+      }
     } catch (error) {
       console.error('Error processing payment:', error)
-      alert('Hubo un error al procesar el pago. Intenta de nuevo.')
-    } finally {
+      alert('An error occurred while processing the payment. Please try again.')
       setIsProcessing(false)
     }
   }
@@ -428,17 +475,56 @@ export default function CheckoutPage() {
                     </span>
                   </div>
 
-                  <button
-                    onClick={handleConfirmPayment}
-                    disabled={isProcessing}
-                    className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    <span className="truncate">
-                      {isProcessing
-                        ? 'Processing...'
-                        : `Confirm & Pay $${total.toFixed(2)}`}
-                    </span>
-                  </button>
+                  {showPaymentLink && paymentLink ? (
+                    <div className="space-y-4">
+                      <div className="bg-primary/10 border border-primary rounded-lg p-4">
+                        <p className="text-sm text-[#0d1b0d] font-medium mb-2">Payment Link</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={paymentLink}
+                            readOnly
+                            className="flex-1 bg-white border border-[#cfe7cf] rounded px-3 py-2 text-sm text-[#0d1b0d]"
+                          />
+                          <button
+                            onClick={handleCopyToClipboard}
+                            className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#0d1b0d] text-sm font-bold hover:opacity-90 transition-opacity"
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowPaymentLink(false)}
+                        className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 border-2 border-[#cfe7cf] text-[#4c9a4c] text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/5 transition-colors"
+                      >
+                        Back
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <button
+                        onClick={handleGeneratePaymentLink}
+                        disabled={isProcessing}
+                        className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
+                      >
+                        <span className="truncate">
+                          {isProcessing ? 'Generating...' : 'Generate Payment Link'}
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleConfirmPayment}
+                        disabled={isProcessing}
+                        className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
+                      >
+                        <span className="truncate">
+                          {isProcessing
+                            ? 'Processing...'
+                            : `Confirm & Pay $${total.toFixed(2)}`}
+                        </span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
