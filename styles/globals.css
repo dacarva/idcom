@@ -14,6 +14,10 @@
 }
 
 @layer base {
+	html {
+		overflow-y: scroll;
+		scrollbar-gutter: stable both-edges;
+	}
 	body {
 		@apply bg-background-light text-text-light;
 	}
