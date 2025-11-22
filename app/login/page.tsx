@@ -5,16 +5,14 @@ export default function LoginPage () {
 		<div className='flex min-h-screen w-full flex-col lg:flex-row'>
 			{/* Left Pane: Image (hidden on mobile, visible on lg+) */}
 			<div
-				className='relative hidden h-full w-full lg:flex lg:flex-1
-					bg-cover bg-center bg-no-repeat'
-				style={{
-					backgroundImage:
-						"linear-gradient(to bottom, rgba(0,0,0,0), " +
-						"rgba(0,0,0,0.3)), " +
-						"url('https://lh3.googleusercontent.com/aida-public/AB6AXuCK4EgK_09-P9IaVEcozEjEBH-VShI9OEaY5fzY6U3sbtKMh-QSTtixhHHXwx7gYdJaiSxHaQ7cR2Tp8Xscib8uS-pMqeknXLnn7rBFB6vo-bDSykIyXz8gEyXEiWUyh12bU8pNXx03hnguBcd8z5dTRKeYxPsgrpPQWMpymWNau2STe6g8UGwOCfjAd1HHmfMWYTgXAitu5byduXhOhE_Ob0qgM_0A4WEQvjQ83fesGKQwqFO1nAA2dDkHjr0lWSxp4LkJ0Xs1-go')",
-				}}
-				data-alt='Essential products and vegetables'
-			/>
+				className='relative hidden w-full lg:flex lg:flex-1'
+			>
+				<img
+					src='/images/login-hero.svg'
+					alt='Essential products and groceries'
+					className='h-full w-full'
+				/>
+			</div>
 
 			{/* Right Pane: Form */}
 			<div
