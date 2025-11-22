@@ -1,35 +1,34 @@
-# IDCom - Ecommerce Platform for Refugees
+# IDCom - Monorepo
 
-IDCom is an ecommerce platform designed to offer discounts and fair prices to refugees. The platform provides an exclusive 30% discount on eligible products for verified refugees, helping them access essential goods at affordable prices.
+IDCom is a monorepo containing an ecommerce platform designed to offer discounts and fair prices to refugees, along with a wallet application and smart contracts.
 
-## Overview
+## Repository Structure
 
-This is a [Next.js](https://nextjs.org) ecommerce application that integrates with blockchain-based identity verification to provide subsidy discounts to eligible refugees. The platform uses Self Protocol for privacy-preserving identity verification and Celo Sepolia blockchain for transparent eligibility verification.
+This is a monorepo managed with npm workspaces, containing three main workspaces:
 
-## Features
+1. **apps/ecommerce** - Next.js ecommerce application with refugee subsidy verification
+2. **apps/wallet** - Wallet application (to be added)
+3. **packages/contracts** - Foundry-based smart contracts for refugee verification
 
-- **Refugee Discount Verification**: QR code-based identity verification using Self Protocol
-- **Blockchain Integration**: Real-time eligibility verification via Celo Sepolia smart contracts
-- **30% Subsidy Discount**: Exclusive discount for verified refugees on eligible products
-- **Privacy-Preserving**: Uses zero-knowledge proofs for identity verification
-- **Transparent Verification**: Blockchain-based event listening for subsidy eligibility
-- **Modern Ecommerce**: Full shopping cart, checkout, and order management
+```
+idcom/
+├── apps/
+│   ├── ecommerce/          # Ecommerce application
+│   └── wallet/             # Wallet application (empty, ready for files)
+├── packages/
+│   └── contracts/         # Smart contracts (ProofOfHuman contract)
+├── .devcontainer/         # Development container configuration
+├── package.json           # Root workspace configuration
+└── README.md             # This file
+```
 
-## Technology Stack
-
-- **Framework**: Next.js 16 with React 19
-- **Styling**: Tailwind CSS 4
-- **State Management**: Zustand
-- **Blockchain**: Ethers.js v6 for Celo Sepolia integration
-- **Identity Verification**: Self Protocol (@selfxyz/qrcode)
-- **Language**: TypeScript
-
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - Node.js 22 or higher
-- npm, yarn, pnpm, or bun
+- npm 10 or higher
+- Foundry (for smart contracts development)
+
+## Getting Started
 
 ### Installation
 
@@ -39,17 +38,77 @@ git clone <repository-url>
 cd idcom
 ```
 
-2. Install dependencies:
+2. Install all workspace dependencies:
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-3. Set up environment variables:
-Create a `.env.local` file in the root directory:
+This will install dependencies for all workspaces (ecommerce, wallet, contracts).
+
+### Development
+
+#### Run Ecommerce App
+```bash
+npm run dev:ecommerce
+# or
+npm run dev  # defaults to ecommerce
+```
+
+The ecommerce app will be available at [http://localhost:3000](http://localhost:3000)
+
+#### Run Wallet App
+```bash
+npm run dev:wallet
+```
+
+The wallet app will be available at [http://localhost:3001](http://localhost:3001)
+
+#### Build Contracts
+```bash
+npm run build:contracts
+```
+
+#### Test Contracts
+```bash
+npm run test:contracts
+```
+
+### Workspace-Specific Commands
+
+You can also run commands in specific workspaces:
+
+```bash
+# Run dev in ecommerce workspace
+npm run dev --workspace=@idcom/ecommerce
+
+# Run build in wallet workspace
+npm run build --workspace=@idcom/wallet
+
+# Run lint in ecommerce workspace
+npm run lint --workspace=@idcom/ecommerce
+```
+
+## Workspaces
+
+### apps/ecommerce
+
+Next.js ecommerce application that integrates with blockchain-based identity verification to provide subsidy discounts to eligible refugees.
+
+**Features:**
+- Refugee discount verification via QR code scanning (Self Protocol)
+- Blockchain integration for eligibility verification (Celo Sepolia)
+- 30% subsidy discount for verified refugees
+- Full shopping cart and checkout functionality
+
+**Technology Stack:**
+- Next.js 16 with React 19
+- Tailwind CSS 4
+- Zustand for state management
+- Ethers.js v6 for blockchain integration
+- Self Protocol for identity verification
+
+**Environment Variables:**
+Create `apps/ecommerce/.env.local`:
 ```env
 NEXT_PUBLIC_SELF_ENDPOINT=<Verifier contract address on Celo Sepolia>
 NEXT_PUBLIC_SELF_ENDPOINT_TYPE=staging_celo
@@ -58,108 +117,143 @@ NEXT_PUBLIC_SELF_SCOPE_SEED=idcom-subsidy
 NEXT_PUBLIC_CELO_SEPOLIA_RPC=<Optional: Custom Celo Sepolia RPC endpoint>
 ```
 
-4. Run the development server:
+### apps/wallet
+
+Wallet application (to be added from another repository).
+
+**Port:** 3001
+
+### packages/contracts
+
+Foundry-based smart contracts for the IDCom platform providing privacy-preserving identity verification for refugee subsidy eligibility.
+
+**Features:**
+- Privacy-preserving identity verification using Self Protocol
+- Age verification (18+)
+- Country restriction enforcement
+- Refugee status tracking and discount eligibility
+- Integration with Self Mobile App
+- Deployed on Celo (testnet and mainnet)
+
+**Technology:**
+- Foundry for development and testing
+- Solidity smart contracts (Solidity 0.8.28)
+- Self Protocol SDK integration
+- OpenZeppelin contracts
+- Celo Sepolia network deployment
+
+**Main Contract:**
+- `ProofOfHuman` - Extends `SelfVerificationRoot` to verify users through passport-based attestations without revealing sensitive personal information on-chain
+
+**Usage:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Build contracts
+npm run build:contracts
+
+# Test contracts
+npm run test:contracts
+
+# Lint contracts
+npm run lint:contracts
+
+# Or run from contracts directory
+cd packages/contracts
+forge build
+forge test
+npm run lint
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+**Network Configuration:**
+- **Celo Sepolia (Testnet)**: `https://forno.celo-sepolia.celo-testnet.org`
+- **Celo Mainnet**: `https://forno.celo.org`
 
-## How It Works
+See `packages/contracts/README.md` for detailed contract documentation.
 
-### Subsidy Verification Process
+## Adding Files from Another Repository
 
-1. **User Registration/Login**: Users create an account or log in to the platform
-2. **QR Code Scan**: Users scan a QR code using the Self Protocol mobile app to verify their identity
-3. **Blockchain Verification**: The platform polls the Celo Sepolia blockchain for `RefugeeDiscountEligibility` events
-4. **Eligibility Check**: The smart contract verifies:
-   - Nationality eligibility (Colombian or Palestinian)
-   - Refugee status
-   - Overall discount eligibility
-5. **Discount Application**: If eligible, users receive a 30% discount on all eligible products
+When adding files from another repository to `apps/wallet` or `packages/contracts`, consider the following:
 
-### Smart Contract Integration
+### Checklist Before Pasting
+- [ ] Remove `node_modules/` folders
+- [ ] Remove lock files (`package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`)
+- [ ] Remove build artifacts (`.next/`, `out/`, `dist/`, `build/`, `cache/`)
+- [ ] Update `package.json` name to workspace format (`@idcom/wallet` or `@idcom/contracts`)
+- [ ] Review and update all import paths
+- [ ] Update config file paths (`tsconfig.json`, `next.config.ts`, `foundry.toml`)
+- [ ] Check for hardcoded port numbers (wallet should use 3001)
+- [ ] Review environment variable paths
+- [ ] After pasting, run `npm install` at root to install all workspaces
 
-The platform integrates with a Verifier smart contract deployed on Celo Sepolia that:
-- Emits `RefugeeDiscountEligibility` events when verification completes
-- Checks nationality and refugee status
-- Determines discount eligibility based on verification results
+### Path Updates Required
+- **Import paths**: Update relative imports to account for monorepo structure
+- **Package references**: Update `package.json` name field to match workspace naming
+- **Config files**: Update paths in `tsconfig.json`, `next.config.ts`, `foundry.toml`
+- **Environment variables**: Create workspace-specific env files (e.g., `apps/wallet/.env.local`)
 
-## Project Structure
-
-```
-idcom/
-├── app/
-│   ├── ABIs/
-│   │   └── Verifier.json          # Smart contract ABI
-│   ├── verify-subsidy/
-│   │   └── page.tsx               # Subsidy verification page
-│   ├── products/
-│   │   └── page.tsx               # Product listing page
-│   ├── cart/
-│   │   └── page.tsx               # Shopping cart
-│   └── checkout/
-│       └── page.tsx                # Checkout page
-├── components/
-│   ├── auth/                      # Authentication components
-│   ├── checkout/                  # Checkout components
-│   └── products/                  # Product components
-├── hooks/
-│   ├── useSelfQR.ts               # Self Protocol QR hook
-│   └── useVerifierEvents.ts       # Blockchain event polling hook
-├── lib/
-│   └── blockchain.ts              # Blockchain utilities
-└── stores/
-    ├── user-store.ts              # User state management
-    └── cart-store.ts              # Cart state management
+### Workspace Dependencies
+If wallet or contracts need to reference ecommerce code, use workspace protocol:
+```json
+{
+  "dependencies": {
+    "@idcom/ecommerce": "workspace:*"
+  }
+}
 ```
 
-## Key Components
+## Development Container
 
-### Subsidy Verification (`app/verify-subsidy/page.tsx`)
-- QR code scanning interface
-- Blockchain event polling
-- Eligibility status display
-- Automatic redirect after verification
+This repository includes a VS Code Dev Container configuration with:
+- Node.js 22
+- Foundry installed
+- VS Code extensions for TypeScript, ESLint, Tailwind CSS, and Solidity
+- Port forwarding for ecommerce (3000) and wallet (3001)
 
-### Blockchain Integration (`lib/blockchain.ts`)
-- Celo Sepolia provider configuration
-- Verifier contract instance creation
-- Event filtering and parsing
-
-### Event Polling (`hooks/useVerifierEvents.ts`)
-- Polls for `RefugeeDiscountEligibility` events
-- Extracts `isEligibleForDiscount` status
-- Handles loading and error states
+To use the dev container:
+1. Open the repository in VS Code
+2. When prompted, click "Reopen in Container"
+3. The container will build and install all dependencies
 
 ## Building for Production
 
 ```bash
-npm run build
-npm start
+# Build ecommerce app
+npm run build:ecommerce
+
+# Build wallet app
+npm run build:wallet
+
+# Build contracts
+npm run build:contracts
 ```
+
+## Scripts Reference
+
+### Root Level Scripts
+- `npm run dev` - Run ecommerce app in development mode
+- `npm run dev:ecommerce` - Run ecommerce app
+- `npm run dev:wallet` - Run wallet app
+- `npm run build` - Build ecommerce app
+- `npm run build:ecommerce` - Build ecommerce app
+- `npm run build:wallet` - Build wallet app
+- `npm run build:contracts` - Build smart contracts
+- `npm run lint` - Lint ecommerce app
+- `npm run lint:ecommerce` - Lint ecommerce app
+- `npm run lint:wallet` - Lint wallet app
+- `npm run lint:contracts` - Lint smart contracts
+- `npm run test:contracts` - Test smart contracts
 
 ## Learn More
 
-- [Next.js Documentation](https://nextjs.org/docs) - Learn about Next.js features and API
-- [Self Protocol](https://self.xyz) - Privacy-preserving identity verification
-- [Celo Network](https://celo.org) - Mobile-first blockchain platform
-- [Ethers.js Documentation](https://docs.ethers.org) - Ethereum library documentation
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Foundry Documentation](https://book.getfoundry.sh/)
+- [npm Workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces)
+- [Self Protocol](https://self.xyz)
+- [Celo Network](https://celo.org)
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please ensure your changes work within the monorepo structure and update relevant workspace configurations as needed.
 
 ## License
 
 This project is private and proprietary.
-
-## Support
-
-For support, please contact the development team or open an issue in the repository.

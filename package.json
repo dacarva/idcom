@@ -1,31 +1,29 @@
 {
-  "name": "idcom",
+  "name": "idcom-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "npm run dev --workspace=@idcom/ecommerce",
+    "dev:ecommerce": "npm run dev --workspace=@idcom/ecommerce",
+    "dev:wallet": "npm run dev --workspace=@idcom/wallet",
+    "build": "npm run build --workspace=@idcom/ecommerce",
+    "build:ecommerce": "npm run build --workspace=@idcom/ecommerce",
+    "build:wallet": "npm run build --workspace=@idcom/wallet",
+    "build:contracts": "cd packages/contracts && forge build",
+    "lint": "npm run lint --workspace=@idcom/ecommerce",
+    "lint:ecommerce": "npm run lint --workspace=@idcom/ecommerce",
+    "lint:wallet": "npm run lint --workspace=@idcom/wallet",
+    "lint:contracts": "cd packages/contracts && npm run lint",
+    "test:contracts": "cd packages/contracts && forge test",
+    "install:all": "npm install"
   },
-  "dependencies": {
-    "@selfxyz/qrcode": "^1.0.17",
-    "ethers": "^6.15.0",
-    "next": "16.0.3",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-icons": "^5.5.0",
-    "zustand": "^5.0.8"
-  },
-  "devDependencies": {
-    "@tailwindcss/forms": "^0.5.10",
-    "@tailwindcss/postcss": "^4.1.17",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.3",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+  "devDependencies": {},
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   }
 }
