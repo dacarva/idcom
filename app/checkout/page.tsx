@@ -496,34 +496,35 @@ export default function CheckoutPage() {
                     </span>
                   </div>
 
-                  {showPaymentLink && paymentLink ? (
-                    <div className="space-y-4">
-                      <div className="bg-primary/10 border border-primary rounded-lg p-4">
-                        <p className="text-sm text-[#0d1b0d] font-medium mb-2">Payment Link</p>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={paymentLink}
-                            readOnly
-                            className="flex-1 bg-white border border-[#cfe7cf] rounded px-3 py-2 text-sm text-[#0d1b0d]"
-                          />
-                      <button
-                        onClick={handleCopyToClipboard}
-                        className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#0d1b0d] text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
-                      >
-                        Copy Link
-                      </button>
+                  {paymentMethod.type === 'wallet' ? (
+                    // Wallet payment - Generate link
+                    showPaymentLink && paymentLink ? (
+                      <div className="space-y-4">
+                        <div className="bg-primary/10 border border-primary rounded-lg p-4">
+                          <p className="text-sm text-[#0d1b0d] font-medium mb-2">Payment Link</p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={paymentLink}
+                              readOnly
+                              className="flex-1 bg-white border border-[#cfe7cf] rounded px-3 py-2 text-sm text-[#0d1b0d]"
+                            />
+                            <button
+                              onClick={handleCopyToClipboard}
+                              className="flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#0d1b0d] text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
+                            >
+                              Copy
+                            </button>
+                          </div>
                         </div>
+                        <button
+                          onClick={() => setShowPaymentLink(false)}
+                          className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 border-2 border-[#cfe7cf] text-[#4c9a4c] text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/5 transition-colors"
+                        >
+                          Back
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setShowPaymentLink(false)}
-                        className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 border-2 border-[#cfe7cf] text-[#4c9a4c] text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/5 transition-colors"
-                      >
-                        Back
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
+                    ) : (
                       <button
                         onClick={handleGeneratePaymentLink}
                         disabled={isProcessing}
@@ -533,18 +534,20 @@ export default function CheckoutPage() {
                           {isProcessing ? 'Generating...' : 'Generate Payment Link'}
                         </span>
                       </button>
-                      <button
-                        onClick={handleConfirmPayment}
-                        disabled={isProcessing}
-                        className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
-                      >
-                        <span className="truncate">
-                          {isProcessing
-                            ? 'Processing...'
-                            : `Confirm & Pay $${total.toFixed(2)}`}
-                        </span>
-                      </button>
-                    </div>
+                    )
+                  ) : (
+                    // Card payment - Direct confirmation
+                    <button
+                      onClick={handleConfirmPayment}
+                      disabled={isProcessing}
+                      className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                      <span className="truncate">
+                        {isProcessing
+                          ? 'Processing...'
+                          : `Confirm & Pay $${total.toFixed(2)}`}
+                      </span>
+                    </button>
                   )}
                 </div>
               </div>
