@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@theme {
+	--color-primary: #A8D8B9;
+	--color-accent: #F9DCC4;
+	--color-soft-mint: #A8D8B9;
+	--color-background-light: #F7F9F7;
+	--color-background-dark: #3D4A4D;
+	--color-text-light: #3D4A4D;
+	--color-text-dark: #F7F9F7;
+	--color-border-light: #cfe7cf;
+	--color-border-dark: #365936;
+}
+
+@layer base {
+	html {
+		overflow-y: scroll;
+		scrollbar-gutter: stable both-edges;
+	}
+	body {
+		@apply bg-background-light text-text-light;
+	}
+	*:focus-visible {
+		@apply outline-none ring-2 ring-primary ring-offset-2
+			ring-offset-background-light;
+	}
+}
