@@ -5,6 +5,8 @@ import { HeartIcon } from '@/components/icons/heart'
 import { useProductsFilterStore } from '@/stores/products-filter-store'
 import { useFavoritesStore } from '@/stores/favorites-store'
 import { useState, useEffect } from 'react'
+import { AiOutlineShoppingCart } from 'react-icons/ai'
+import { AiOutlineUser } from 'react-icons/ai'
 
 interface AppHeaderProps {
 	cartCount?: number
@@ -87,8 +89,8 @@ export function AppHeader ({
 
 				{/* Cart */}
 				<Link href='/cart'>
-					<button className='relative flex cursor-pointer items-center justify-center rounded-full size-10 bg-primary/20'>
-						🛒
+					<button className='relative flex cursor-pointer items-center justify-center rounded-full size-10 bg-primary/20 text-[#0d7d0d] hover:bg-primary/30 transition-colors'>
+						<AiOutlineShoppingCart className='w-6 h-6' />
 						{cartCount > 0 && (
 							<span className='absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold size-5'>
 								{cartCount}
@@ -107,8 +109,10 @@ export function AppHeader ({
 					</button>
 				)}
 
-				{/* Avatar */}
-				<div className='size-10 rounded-full bg-gradient-to-br from-soft-mint to-primary' />
+				{/* User Avatar */}
+				<button className='flex items-center justify-center rounded-full size-10 bg-primary/20 text-[#0d7d0d] hover:bg-primary/30 transition-colors'>
+					<AiOutlineUser className='w-6 h-6' />
+				</button>
 			</div>
 		</header>
 	)
