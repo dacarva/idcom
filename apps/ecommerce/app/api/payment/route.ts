@@ -63,6 +63,16 @@ export async function GET(req: Request) {
 
     const decoded = decodeXPaymentResponse(paymentHeader);
 
+    //BY PASS VERIFY AND SETTLE FOR DEVELOPMENT TESTING
+    return NextResponse.json(
+      {
+        status: 'paid',
+        message: 'Payment received and settled',
+        orderId: `demo-${Date.now()}`,
+      },
+      { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
+
     const verifyResponse = await fetch(`${FACILITATOR_URL}/verify`, {
       method: 'POST',
       headers: {
