@@ -49,7 +49,7 @@ export default function VerifySubsidyPage() {
       <ToastNotification toast={toast} />
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-3">
           <h1 className="text-[#0d1b0d] text-3xl font-black leading-tight tracking-[-0.033em] mb-2">
             {isVerified ? 'Subsidy Verified!' : 'Verify Your Subsidy'}
           </h1>
@@ -97,34 +97,32 @@ export default function VerifySubsidyPage() {
           <p className="text-sm text-[#0d1b0d] text-center mb-4">
             {isVerified ? 'Enjoy your exclusive discount on eligible products!' : 'Point your camera at the QR code to verify your subsidy eligibility'}
           </p>
-        </div>
 
-        {!isVerified && (
-          <>
-            {/* Status Display */}
-            <div className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary/10 border-2 border-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] mb-4">
+          {!isVerified && (
+            <div className="w-full max-w-xs flex items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary/10 text-[#0d1b0d] text-sm font-bold leading-normal tracking-[0.015em] mx-auto">
               <div className="flex items-center gap-2">
                 <AiOutlineLoading3Quarters className="w-5 h-5 text-primary animate-spin" />
                 <span>Waiting for QR Scan</span>
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Skip Button */}
-            <button
-              onClick={handleSkip}
-              className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 border-2 border-[#cfe7cf] text-[#4c9a4c] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#cfe7cf]/10 transition-colors"
-            >
-              Skip for Now
-            </button>
-          </>
+        {!isVerified && (
+          <button
+            onClick={handleSkip}
+            className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 border-2 border-[#cfe7cf] text-[#4c9a4c] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#cfe7cf]/10 transition-colors mt-8"
+          >
+            Skip for Now
+          </button>
         )}
 
         {isVerified && (
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push('/products')}
             className="w-full flex items-center justify-center overflow-hidden rounded-lg h-14 px-4 bg-primary text-[#0d1b0d] text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90 transition-opacity"
           >
-            Go Back
+            Continue to Products
           </button>
         )}
 
