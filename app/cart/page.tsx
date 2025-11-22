@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { AppHeader } from '@/components/layout/app-header'
+import { Breadcrumb } from '@/components/layout/breadcrumb'
 import { useCartStore } from '@/stores/cart-store'
 import { Button } from '@/components/ui/button'
 
@@ -45,25 +46,13 @@ export default function CartPage () {
 				<div className='container mx-auto px-4 py-8 md:py-12'>
 					{/* Breadcrumbs */}
 					<div className='mb-6 flex flex-wrap items-center gap-2'>
-						<Link href='/'
-							className='text-sm font-medium text-green-600
-								hover:underline'>
-							Home
-						</Link>
-						<span className='text-sm font-medium text-gray-400'>
-							/
-						</span>
-						<Link href='/products'
-							className='text-sm font-medium text-green-600
-								hover:underline'>
-							Products
-						</Link>
-						<span className='text-sm font-medium text-gray-400'>
-							/
-						</span>
-						<span className='text-sm font-medium text-gray-900'>
-							Shopping Cart
-						</span>
+						<Breadcrumb
+							items={[
+								{ label: 'Home', href: '/' },
+								{ label: 'Products', href: '/products' },
+								{ label: 'Shopping Cart' },
+							]}
+						/>
 					</div>
 
 					{/* Heading */}
