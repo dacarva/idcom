@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -9,7 +10,11 @@ import { useToastNotification, ToastNotification } from '@/components/ui/toast'
 import { CopyableLink } from '@/components/ui/copyable-link'
 import { AiOutlineLoading3Quarters } from 'react-icons/ai'
 import { MdEmojiEmotions } from 'react-icons/md'
-import { SelfQRcodeWrapper } from '@selfxyz/qrcode'
+
+const SelfQRcodeWrapper = dynamic(
+  () => import('@selfxyz/qrcode').then((m) => m.SelfQRcodeWrapper),
+  { ssr: false }
+)
 
 export default function VerifySubsidyPage() {
   const router = useRouter()
@@ -20,13 +25,17 @@ export default function VerifySubsidyPage() {
   const isVerified = user?.hasSubsidy ?? false
   const { toast, success: showSuccess, error: showError } = useToastNotification()
 
-  const { selfApp, isLoading: qrLoading, universalLink } = useSelfQR({
+  const { selfApp, isLoading: qrLoading, universalLink, error: qrError } = useSelfQR({
     userId: user?.id || '',
     userDefinedData: `Subsidy verification for ${user?.email}`,
     onSuccess: () => {
       verifySubsidy()
     },
   })
+
+  useEffect(() => {
+    console.log('QR State:', { selfApp, qrLoading, universalLink, qrError, userId: user?.id })
+  }, [selfApp, qrLoading, universalLink, qrError, user?.id])
 
   useEffect(() => {
     if (!isLoggedIn) {
