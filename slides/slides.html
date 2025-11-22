@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essentials - ETH Global Buenos Aires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            background-color: #0f172a;
+            color: white;
+        }
+
+        /* Slide Container */
+        .slides-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            box-sizing: border-box;
+            position: relative;
+            opacity: 0.3;
+            transition: opacity 0.5s ease;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        /* Decorative Elements */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        /* Custom UI Components for Mockups */
+        .phone-image {
+            width: 280px;
+            height: auto;
+            border-radius: 30px;
+            border: 8px solid #1e293b;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+        }
+
+        .phone-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .btn-primary {
+            background-color: #22c55e;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            width: 100%;
+            display: block;
+        }
+
+        /* Stack Logos (CSS representations) */
+        .stack-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .stack-card:hover {
+            transform: translateY(-5px);
+            border-color: #22c55e;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: #22c55e;
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-dots {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+        }
+        .dot.active {
+            background: #22c55e;
+        }
+        
+        .highlight {
+            color: #22c55e;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Decorative Background Blobs -->
+    <div class="blob bg-green-600 w-96 h-96 rounded-full top-0 left-0 mix-blend-screen"></div>
+    <div class="blob bg-blue-600 w-96 h-96 rounded-full bottom-0 right-0 mix-blend-screen"></div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="text-center max-w-4xl">
+                <div class="mb-6 inline-block px-4 py-1 rounded-full border border-green-500 text-green-400 text-sm font-mono animate-pulse">
+                    ETH Global Buenos Aires
+                </div>
+                <h1 class="text-7xl font-extrabold mb-6 tracking-tight">
+                    Essentials
+                </h1>
+                <p class="text-2xl text-gray-300 font-light mb-10">
+                    Dignity & Access through <span class="highlight font-semibold">Zero-Knowledge</span> Commerce.
+                </p>
+                <div class="flex justify-center gap-4 text-gray-400">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved"></i> Privacy First
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-wallet"></i> x402 Wallet
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> ZK Subsidy
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide">
+            <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6 border-l-4 border-green-500 pl-4">The Challenge</h2>
+                    <ul class="space-y-6 text-xl text-gray-300">
+                        <li class="flex items-start gap-4">
+                            <div class="bg-red-500/20 p-3 rounded-lg text-red-400"><i class="fa-solid fa-ban"></i></div>
+                            <div>
+                                <strong class="text-white block">Financial Exclusion</strong>
+                                Refugees often lack verifiable banking history or local IDs to access basic services.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="bg-orange-500/20 p-3 rounded-lg text-orange-400"><i class="fa-solid fa-eye-slash"></i></div>
+                            <div>
+                                <strong class="text-white block">Privacy Risks</strong>
+                                Proving "refugee status" traditionally requires exposing sensitive personal data to vendors.
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="bg-yellow-500/20 p-3 rounded-lg text-yellow-400"><i class="fa-solid fa-money-bill-wave"></i></div>
+                            <div>
+                                <strong class="text-white block">High Cost of Living</strong>
+                                Essential goods are expensive in host countries, draining limited resources quickly.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="flex justify-center">
+                    <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-2xl text-center">
+                        <i class="fa-solid fa-users-slash text-6xl text-gray-500 mb-4"></i>
+                        <p class="text-lg">Traditional Aid Systems are <br> <span class="text-red-400 font-bold">Slow, Invasive & Centralized</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: The Solution -->
+        <div class="slide">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold">The <span class="highlight">Essentials</span> Ecosystem</h2>
+                <p class="text-xl text-gray-400 mt-4">A dual-app system bridging Identity and Commerce</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl w-full">
+                <!-- App 1 -->
+                <div class="bg-gray-800/50 p-8 rounded-2xl border border-gray-700 hover:border-green-500 transition-all">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="p-4 bg-green-500/20 rounded-xl text-green-400 text-3xl">
+                            <i class="fa-solid fa-store"></i>
+                        </div>
+                        <span class="text-sm font-mono text-gray-400">App 01</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Essentials Store</h3>
+                    <p class="text-gray-300 mb-4">An e-commerce platform that uses ZK-proofs to verify eligibility without knowing <em>who</em> the user is.</p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Connects with Self.xyz App</li>
+                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Verifies "Refugee" Credential</li>
+                        <li><i class="fa-solid fa-check text-green-500 mr-2"></i>Unlocks 30% Automatic Subsidy</li>
+                    </ul>
+                </div>
+
+                <!-- App 2 -->
+                <div class="bg-gray-800/50 p-8 rounded-2xl border border-gray-700 hover:border-blue-500 transition-all">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="p-4 bg-blue-500/20 rounded-xl text-blue-400 text-3xl">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <span class="text-sm font-mono text-gray-400">App 02</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">x402 Wallet</h3>
+                    <p class="text-gray-300 mb-4">A specialized crypto wallet compliant with the x402 standard for seamless payments.</p>
+                    <ul class="text-sm text-gray-400 space-y-2">
+                        <li><i class="fa-solid fa-check text-blue-500 mr-2"></i>Payment Abstraction</li>
+                        <li><i class="fa-solid fa-check text-blue-500 mr-2"></i>Multi-chain support</li>
+                        <li><i class="fa-solid fa-check text-blue-500 mr-2"></i>Optimized for low-fee networks</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: The Stack -->
+        <div class="slide">
+            <h2 class="text-4xl font-bold mb-12">The Stack</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl w-full">
+                
+                <!-- Identity -->
+                <div class="stack-card col-span-1">
+                    <h3 class="text-xl font-semibold mb-4 text-purple-400">Identity & Auth</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-black font-bold text-xs">S</div>
+                            <div>
+                                <p class="font-bold">Self.xyz</p>
+                                <p class="text-xs text-gray-400">ZK Identity Verification</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white"><i class="fa-solid fa-fingerprint"></i></div>
+                            <div>
+                                <p class="font-bold">Privy</p>
+                                <p class="text-xs text-gray-400">Onboarding & Embedded Wallets</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blockchain Infra -->
+                <div class="stack-card col-span-1">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-400">Infrastructure</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="block font-bold text-yellow-500">Celo</span>
+                            <span class="text-[10px] text-gray-400">Mobile First</span>
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="block font-bold text-orange-500">Rootstock</span>
+                            <span class="text-[10px] text-gray-400">Bitcoin Security</span>
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="block font-bold text-blue-500">Base</span>
+                            <span class="text-[10px] text-gray-400">L2 Scale</span>
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded text-center border border-gray-600">
+                            <span class="block font-bold text-purple-500">Polygon</span>
+                            <span class="text-[10px] text-gray-400">Payment Network</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Protocol -->
+                <div class="stack-card col-span-1">
+                    <h3 class="text-xl font-semibold mb-4 text-green-400">Protocol</h3>
+                    <div class="flex flex-col h-full justify-center">
+                        <div class="text-center">
+                            <div class="text-4xl font-mono font-bold mb-2">x402</div>
+                            <p class="text-sm text-gray-400">Standard for request-for-payment over HTTP.</p>
+                            <p class="text-xs text-gray-500 mt-2">Enables standard wallet interactions.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Slide 5: Architecture Diagram -->
+        <div class="slide">
+            <h2 class="text-3xl font-bold mb-8">Verification Flow</h2>
+            <div class="relative w-full max-w-4xl p-8 bg-white/5 rounded-2xl border border-dashed border-gray-600 flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- User -->
+                <div class="text-center z-10">
+                    <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-gray-600">
+                        <i class="fa-solid fa-user text-3xl"></i>
+                    </div>
+                    <p class="font-bold">Refugee</p>
+                    <p class="text-xs text-gray-400">Has Credential</p>
+                </div>
+
+                <!-- Connection Line -->
+                <div class="hidden md:block h-1 flex-1 bg-gray-600 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 px-2 rounded">ZK Proof</div>
+                </div>
+
+                <!-- Self App -->
+                <div class="text-center z-10">
+                     <div class="w-20 h-20 bg-black rounded-xl flex items-center justify-center mx-auto mb-2 border-4 border-white">
+                        <span class="font-bold text-white">Self</span>
+                    </div>
+                    <p class="font-bold">Identity App</p>
+                    <p class="text-xs text-gray-400">Generates Proof</p>
+                </div>
+
+                 <!-- Connection Line -->
+                 <div class="hidden md:block h-1 flex-1 bg-green-900 relative">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 px-2 rounded text-green-400">Verified True</div>
+                </div>
+
+                <!-- Commerce App -->
+                <div class="text-center z-10">
+                     <div class="w-20 h-20 bg-green-600 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-lg shadow-green-500/50">
+                        <i class="fa-solid fa-cart-shopping text-3xl text-white"></i>
+                    </div>
+                    <p class="font-bold">Essentials</p>
+                    <p class="text-xs text-gray-400">Applies Subsidy</p>
+                </div>
+
+            </div>
+            <div class="mt-8 text-center max-w-2xl text-gray-400 text-sm">
+                * The Essentials Store <strong>never</strong> sees the user's raw ID documents. It only receives a cryptographic "Yes" from the Self app confirming they belong to the refugee group.
+            </div>
+        </div>
+
+        <!-- Slide 6: UI Mockup Demo -->
+        <div class="slide">
+            <div class="absolute top-8 left-0 w-full text-center">
+                <h2 class="text-3xl font-bold">User Experience</h2>
+                <p class="text-gray-400 text-sm">From Login to Subsidized Checkout</p>
+            </div>
+
+            <div class="flex gap-8 overflow-x-auto py-10 px-4 items-center justify-center w-full">
+                
+                <!-- Screen 1: Login -->
+                <img src="./assets/Login.png" alt="Login Screen" class="phone-image">
+
+                <!-- Screen 2: Success (Placeholder) -->
+                <img src="./assets/Subsidy.png" alt="Success Screen" class="phone-image">
+
+                <!-- Screen 3: Cart (Placeholder) -->
+                <img src="./assets/Market.png" alt="Cart Screen" class="phone-image">
+
+            </div>
+        </div>
+
+        <!-- Slide 7: Why this matters -->
+        <div class="slide">
+            <div class="grid grid-cols-1 md:grid-cols-2 w-full max-w-6xl h-full items-center">
+                <div class="p-8">
+                    <h2 class="text-5xl font-bold mb-8">Why Build This?</h2>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-2xl font-bold text-green-400 mb-2">Human Dignity</h3>
+                            <p class="text-gray-300">Shopping should feel normal. Subsidies are applied discreetly in the app, not at a stigmatizing "aid counter".</p>
+                        </div>
+                         <div>
+                            <h3 class="text-2xl font-bold text-blue-400 mb-2">Security</h3>
+                            <p class="text-gray-300">Refugees are vulnerable targets. By using ZK proofs, we ensure their location and identity data is never stored on our servers.</p>
+                        </div>
+                         <div>
+                            <h3 class="text-2xl font-bold text-purple-400 mb-2">Efficiency</h3>
+                            <p class="text-gray-300">Programmable money (Crypto) ensures funds are spent on essentials, reducing fraud and administrative overhead.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center items-center relative">
+                    <div class="absolute inset-0 bg-green-500 blur-[100px] opacity-20"></div>
+                    <i class="fa-solid fa-heart-circle-check text-[200px] text-white z-10 drop-shadow-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Thank You -->
+        <div class="slide">
+            <div class="text-center z-10">
+                <h1 class="text-6xl font-bold mb-6">Thank You</h1>
+                <div class="flex gap-4 justify-center mb-12">
+                    <span class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-600">github.com/eth-essentials</span>
+                    <span class="bg-gray-800 px-4 py-2 rounded-lg border border-gray-600">@EssentialsApp</span>
+                </div>
+                <p class="text-xl text-gray-400 mb-8">Built at ETH Global Buenos Aires 🇦🇷</p>
+                
+                <div class="grid grid-cols-5 gap-4 opacity-50 max-w-3xl mx-auto grayscale hover:grayscale-0 transition-all">
+                    <!-- Fake partner logos -->
+                    <div class="text-center font-bold text-xl">CELO</div>
+                    <div class="text-center font-bold text-xl">PRIVY</div>
+                    <div class="text-center font-bold text-xl">ROOTSTOCK</div>
+                    <div class="text-center font-bold text-xl">BASE</div>
+                    <div class="text-center font-bold text-xl">POLYGON</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-dots" id="navDots">
+        <!-- Dots generated by JS -->
+    </div>
+
+    <div class="fixed bottom-6 right-6 text-gray-500 text-xs">
+        Use Arrow Keys to Navigate
+    </div>
+
+    <script>
+        const container = document.getElementById('slidesContainer');
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progressBar');
+        const navDots = document.getElementById('navDots');
+        let currentSlide = 0;
+
+        // Init dots
+        slides.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if(index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            navDots.appendChild(dot);
+        });
+
+        function updateSlide() {
+            container.style.transform = `translateX(-${currentSlide * 100}vw)`;
+            
+            slides.forEach((slide, index) => {
+                if(index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                if(index === currentSlide) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function goToSlide(index) {
+            if(index >= 0 && index < slides.length) {
+                currentSlide = index;
+                updateSlide();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Touch Navigation
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            if (touchEndX < touchStartX - 50) nextSlide();
+            if (touchEndX > touchStartX + 50) prevSlide();
+        }
+
+        updateSlide();
+    </script>
+</body>
+</html>
