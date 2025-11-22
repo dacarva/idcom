@@ -1,12 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { HeartIcon } from '@/components/icons/heart'
 import { useProductsFilterStore } from '@/stores/products-filter-store'
 import { useFavoritesStore } from '@/stores/favorites-store'
-import { useState, useEffect } from 'react'
+import { useUserStore } from '@/stores/user-store'
+import { useState, useEffect, useRef } from 'react'
 import { AiOutlineShoppingCart } from 'react-icons/ai'
 import { AiOutlineUser } from 'react-icons/ai'
+import { BiLogOut } from 'react-icons/bi'
 
 interface AppHeaderProps {
 	cartCount?: number
@@ -25,14 +28,40 @@ export function AppHeader ({
 	onMobileMenuClick,
 	navItems = [],
 }: AppHeaderProps) {
+	const router = useRouter()
 	const searchQuery = useProductsFilterStore((state) => state.searchQuery)
 	const setSearchQuery = useProductsFilterStore((state) => state.setSearchQuery)
 	const favoritesCount = useFavoritesStore((state) => state.getCount())
+	const logout = useUserStore((state) => state.logout)
 	const [mounted, setMounted] = useState(false)
+	const [showUserMenu, setShowUserMenu] = useState(false)
+	const userMenuRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		setMounted(true)
 	}, [])
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+				setShowUserMenu(false)
+			}
+		}
+
+		if (showUserMenu) {
+			document.addEventListener('mousedown', handleClickOutside)
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [showUserMenu])
+
+	const handleLogout = () => {
+		logout()
+		setShowUserMenu(false)
+		router.push('/login')
+	}
 	return (
 		<header className='sticky top-0 z-20 flex items-center justify-between border-b border-border-light px-4 py-3 sm:px-8 md:px-10 lg:px-20 bg-background-light/80 backdrop-blur-sm'>
 			{/* Logo */}
@@ -109,10 +138,28 @@ export function AppHeader ({
 					</button>
 				)}
 
-				{/* User Avatar */}
-				<button className='flex items-center justify-center rounded-full size-10 bg-primary/20 text-[#0d7d0d] hover:bg-primary/30 transition-colors'>
-					<AiOutlineUser className='w-6 h-6' />
-				</button>
+				{/* User Avatar with Dropdown */}
+				<div className='relative' ref={userMenuRef}>
+					<button
+						onClick={() => setShowUserMenu(!showUserMenu)}
+						className='flex items-center justify-center rounded-full size-10 bg-primary/20 text-[#0d7d0d] hover:bg-primary/30 transition-colors'
+					>
+						<AiOutlineUser className='w-6 h-6' />
+					</button>
+
+					{/* Dropdown Menu */}
+					{showUserMenu && (
+						<div className='absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-border-light z-50'>
+							<button
+								onClick={handleLogout}
+								className='w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-lg'
+							>
+								<BiLogOut className='w-5 h-5' />
+								Logout
+							</button>
+						</div>
+					)}
+				</div>
 			</div>
 		</header>
 	)
