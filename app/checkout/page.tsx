@@ -196,7 +196,7 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-[#F7F9F7]">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top-2">
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-in fade-in slide-in-from-bottom-2">
           <div
             className={`rounded-lg px-4 py-3 text-white font-medium shadow-lg ${
               toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
