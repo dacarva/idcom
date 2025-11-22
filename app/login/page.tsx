@@ -31,7 +31,7 @@ export default function LoginPage () {
 							>
 								<path d='M12 2C12 2 8 6 8 12c0 2.21 1.79 4 4 4s4-1.79 4-4c0-6-4-10-4-10z' />
 							</svg>
-									<span className='text-text-light'>Idcommerce</span>
+									<span className='text-text-light'>idcom</span>
 						</div>
 
 						<div className='flex flex-col gap-2 text-center'>

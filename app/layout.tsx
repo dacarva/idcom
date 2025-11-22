@@ -10,8 +10,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata: Metadata = {
-	title: 'Essential Goods Platform',
-	description: 'Buy essential products with discounts',
+	title: 'idcom - Essential Products',
+	description: 'Shop essential products with exclusive discounts',
 }
 
 export const viewport: Viewport = {
