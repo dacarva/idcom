@@ -20,7 +20,7 @@ export function getCeloSepoliaProvider(): ethers.JsonRpcProvider {
 // Get Verifier contract instance
 export function getVerifierContract(): ethers.Contract {
   const contractAddress = process.env.NEXT_PUBLIC_SELF_ENDPOINT
-  
+
   if (!contractAddress) {
     throw new Error('NEXT_PUBLIC_SELF_ENDPOINT environment variable is not set')
   }
@@ -36,7 +36,7 @@ export function getVerifierContract(): ethers.Contract {
 // Get contract address
 export function getVerifierContractAddress(): string {
   const contractAddress = process.env.NEXT_PUBLIC_SELF_ENDPOINT
-  
+
   if (!contractAddress) {
     throw new Error('NEXT_PUBLIC_SELF_ENDPOINT environment variable is not set')
   }

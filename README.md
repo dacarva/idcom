@@ -2,6 +2,8 @@
 
 IDCom is a monorepo containing an ecommerce platform designed to offer discounts and fair prices to refugees, along with a wallet application and smart contracts.
 
+The landing page is available at [https://v0-landing-page-for-app-ten-flame.vercel.app/](https://v0-landing-page-for-app-ten-flame.vercel.app/)
+
 ## Repository Structure
 
 This is a monorepo managed with npm workspaces, containing three main workspaces:
