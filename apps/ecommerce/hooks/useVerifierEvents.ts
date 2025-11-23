@@ -1,16 +1,6 @@
-import { useEffect, useState, useRef } from 'react'
-import { ethers } from 'ethers'
-import { getVerifierContract, getVerifierContractAddress } from '@/lib/blockchain'
 
-interface RefugeeDiscountEligibilityEvent {
-  passportHash: string
-  nationality: string
-  isEligibleNationality: boolean
-  isRefugee: boolean
-  isEligibleForDiscount: boolean
-  blockNumber: number
-  transactionHash: string
-}
+import { useEffect, useState, useRef } from 'react'
+import { checkEligibility, RefugeeDiscountEligibilityEvent } from '@/app/actions/verify-subsidy'
 
 interface UseVerifierEventsReturn {
   eligibilityEvent: RefugeeDiscountEligibilityEvent | null
@@ -21,7 +11,6 @@ interface UseVerifierEventsReturn {
 }
 
 const POLL_INTERVAL = 3000 // 3 seconds
-const BLOCKS_TO_CHECK = 10 // Check last 10 blocks
 
 export function useVerifierEvents(): UseVerifierEventsReturn {
   const [eligibilityEvent, setEligibilityEvent] = useState<RefugeeDiscountEligibilityEvent | null>(null)
@@ -47,41 +36,13 @@ export function useVerifierEvents(): UseVerifierEventsReturn {
     }
 
     try {
-      const contract = getVerifierContract()
-      const provider = contract.runner?.provider as ethers.JsonRpcProvider
-      
-      if (!provider) {
-        throw new Error('Provider not available')
-      }
+      // Call the Server Action
+      const eventData = await checkEligibility()
 
-      // Get current block number
-      const currentBlock = await provider.getBlockNumber()
-      const fromBlock = Math.max(0, currentBlock - BLOCKS_TO_CHECK)
-
-      // Query for RefugeeDiscountEligibility events
-      const filter = contract.filters.RefugeeDiscountEligibility()
-      const events = await contract.queryFilter(filter, fromBlock, currentBlock)
-
-      if (events.length > 0) {
-        // Get the most recent event
-        const latestEvent = events[events.length - 1]
-        
-        // Type guard: check if it's an EventLog with args property
-        if ('args' in latestEvent && latestEvent.args && Array.isArray(latestEvent.args) && latestEvent.args.length >= 5) {
-          const eventData: RefugeeDiscountEligibilityEvent = {
-            passportHash: String(latestEvent.args[0]),
-            nationality: String(latestEvent.args[1]),
-            isEligibleNationality: Boolean(latestEvent.args[2]),
-            isRefugee: Boolean(latestEvent.args[3]),
-            isEligibleForDiscount: Boolean(latestEvent.args[4]),
-            blockNumber: latestEvent.blockNumber,
-            transactionHash: latestEvent.transactionHash,
-          }
-
-          setEligibilityEvent(eventData)
-          setError(null)
-          stopPolling()
-        }
+      if (eventData) {
+        setEligibilityEvent(eventData)
+        setError(null)
+        stopPolling()
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to check for events')
