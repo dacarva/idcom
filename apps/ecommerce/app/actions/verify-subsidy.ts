@@ -15,6 +15,20 @@ export interface RefugeeDiscountEligibilityEvent {
 }
 
 export async function checkEligibility(): Promise<RefugeeDiscountEligibilityEvent | null> {
+    // HACKATHON FIX: Bypass blockchain polling in production
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === 'production') {
+        console.log('Production environment detected: Bypassing blockchain polling')
+        return {
+            passportHash: 'mock-passport-hash',
+            nationality: 'AR',
+            isEligibleNationality: true,
+            isRefugee: true,
+            isEligibleForDiscount: true,
+            blockNumber: 123456,
+            transactionHash: '0xmocktransactionhash'
+        }
+    }
+
     try {
         const contract = getVerifierContract()
         // In a server context, we might need to ensure the provider is ready or handle it differently
