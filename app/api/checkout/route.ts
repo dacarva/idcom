@@ -45,35 +45,45 @@ export async function POST(request: NextRequest) {
     )
     console.log(`🔑 Encryption key derived from wallet`)
 
-    // Archive order to Filecoin (with encryption)
+    // Archive order to Filecoin (non-blocking: background)
     let cid: string | null = null
-    let archiveResult = null
-    
-    try {
-      if (filecoinService.isConfigured()) {
-        const uploadResult = await filecoinService.uploadOrder(orderData, encryptionKey)
-        cid = uploadResult.cid
-        archiveResult = uploadResult
-        console.log(`✅ Order archived to Filecoin with CID: ${cid}`)
-      } else {
-        console.warn('⚠️ Filecoin not configured, order saved locally only')
-      }
-    } catch (archiveError) {
-      console.error('⚠️ Filecoin archival failed, but order creation continues:', archiveError)
-      // Don't fail checkout if Filecoin fails
+
+    if (filecoinService.isConfigured()) {
+      filecoinService
+        .uploadOrder(orderData, encryptionKey)
+        .then(async (uploadResult) => {
+          try {
+            cid = uploadResult.cid
+            console.log(`✅ Background archival complete. CID: ${cid}`)
+            // Update DB with CID once ready (best-effort)
+            try {
+              if (orderService.isConfigured()) {
+                await orderService.updateOrderCid(orderId, cid)
+                console.log(`✅ Order CID saved to DB: ${orderId} → ${cid}`)
+              }
+            } catch (dbUpdateErr) {
+              console.warn('⚠️ Could not update order CID in DB:', dbUpdateErr)
+            }
+          } catch (e) {
+            console.error('⚠️ Background archival post-processing failed:', e)
+          }
+        })
+        .catch((archiveError) => {
+          console.error('⚠️ Background Filecoin archival failed:', archiveError)
+        })
+    } else {
+      console.warn('⚠️ Filecoin not configured, order saved locally only')
     }
 
-    // Save order to Supabase database with wallet signature
+    // Save order to Supabase database with encryption salt
     try {
       if (orderService.isConfigured()) {
         await orderService.saveOrder({
           ...orderData,
           cid,
-          wallet_address: walletSignature.walletAddress,
-          wallet_signature: walletSignature.signature,
           encryption_salt: walletSignature.salt,
         })
-        console.log(`✅ Order saved to Supabase database with wallet signature`)
+        console.log(`✅ Order saved to Supabase database`)
       } else {
         console.warn('⚠️ Supabase not configured, order saved to Filecoin only')
       }
@@ -86,13 +96,14 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         orderId,
-        cid,
-        walletAddress: walletSignature.walletAddress,
-        walletSignature: walletSignature.signature,
+        cid, // will be null until background archival completes
+        status: filecoinService.isConfigured() ? 'pending' : 'created',
         encryptionSalt: walletSignature.salt,
-        message: cid ? 'Order created and archived to Filecoin (wallet-secured)' : 'Order created (Filecoin archival skipped)',
+        message: filecoinService.isConfigured()
+          ? 'Order created. Filecoin archival is running in the background.'
+          : 'Order created (Filecoin archival skipped)',
       },
-      { status: 201 }
+      { status: filecoinService.isConfigured() ? 202 : 201 }
     )
   } catch (error) {
     console.error('Checkout API error:', error)

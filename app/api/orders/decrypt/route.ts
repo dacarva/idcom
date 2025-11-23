@@ -4,8 +4,13 @@ import { encryptionService } from '@/services/encryption.service'
 import { walletService } from '@/services/wallet.service'
 import { orderService } from '@/services/order.service'
 
+interface Order {
+  encryption_salt: string | null;
+}
+
 interface DecryptRequest {
   cid: string
+  walletAddress: string
 }
 
 /**
@@ -17,11 +22,11 @@ interface DecryptRequest {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as DecryptRequest
-    const { cid } = body
+    const { cid, walletAddress } = body
 
-    if (!cid) {
+    if (!cid || !walletAddress) {
       return NextResponse.json(
-        { error: 'Missing cid' },
+        { error: 'Missing cid or walletAddress' },
         { status: 400 }
       )
     }
@@ -60,34 +65,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Load wallet data for this order from Supabase
-    // For now we derive server-side using the stored mock signature
-    let walletAddress: string | null = null
-    let walletSignature: string | null = null
+    // Load encryption salt from Supabase
     let encryptionSalt: string | null = null
 
     try {
       if (orderService.isConfigured()) {
         const order = await orderService.getOrderByCid(cid)
-        walletAddress = order?.wallet_address || null
-        walletSignature = order?.wallet_signature || null
-        encryptionSalt = order?.encryption_salt || null
+        if (order) {
+          encryptionSalt = order.encryption_salt || null
+        }
       }
     } catch (e) {
-      console.warn('⚠️ Could not load order wallet data from DB, proceeding without it')
+      console.warn('⚠️ Could not load order salt from DB')
     }
 
-    if (!walletAddress || !walletSignature || !encryptionSalt) {
+    if (!encryptionSalt) {
       return NextResponse.json(
-        { error: 'Missing wallet data for decryption' },
+        { error: 'Missing encryption salt for decryption' },
         { status: 400 }
       )
     }
 
-    // Derive encryption key from wallet signature
+    // User must provide a wallet address that was used to encrypt
+    // The client will sign a message with this wallet to prove ownership
+    // For now, we create a temporary signature from the provided address
+    console.log(`🔑 Using wallet address for decryption: ${walletAddress.substring(0, 8)}...`)
+
+    // Create a decryption signature (in production, this would come from the client)
+    // For now, we use a deterministic message
+    const decryptionMessage = `Decrypt order ${cid}`
+    const tempSignature = walletService.createDeterministicSignature(walletAddress, decryptionMessage)
+
+    // Derive encryption key from wallet address + deterministic signature
     const encryptionKey = walletService.deriveEncryptionKey(
       walletAddress,
-      walletSignature,
+      tempSignature,
       encryptionSalt
     )
 

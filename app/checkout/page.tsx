@@ -217,26 +217,14 @@ export default function CheckoutPage() {
       // Limpiar carrito
       clear()
 
-      // Generar link de pago
-      const paymentResponse = await fetch(`/api/checkout?amount=${total.toFixed(2)}`)
+      // Redirigir a order confirmation con detalles
+      const confirmationUrl = new URL('/order-confirmation', window.location.origin)
+      confirmationUrl.searchParams.set('orderId', orderId)
+      if (cid) confirmationUrl.searchParams.set('cid', cid)
+      if (encryptionSalt) confirmationUrl.searchParams.set('encryptionSalt', encryptionSalt)
+      confirmationUrl.searchParams.set('status', 'pending')
       
-      if (!paymentResponse.ok) {
-        throw new Error('Failed to generate payment link')
-      }
-      
-      const paymentData = await paymentResponse.json()
-      
-      // Guardar CID para redirigir después del pago
-      if (cid) {
-        sessionStorage.setItem('orderCid', cid)
-      }
-      
-      // Redirigir a link de pago
-      if (paymentData.paymentLink) {
-        window.location.href = paymentData.paymentLink
-      } else {
-        throw new Error('No payment link returned')
-      }
+      window.location.href = confirmationUrl.toString()
     } catch (error) {
       console.error('Error processing payment:', error)
       handleShowError('Payment error')

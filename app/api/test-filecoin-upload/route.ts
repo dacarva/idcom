@@ -5,18 +5,15 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { filecoinSynapseService } from '@/services/filecoin-synapse.service';
-import { encryptionService } from '@/services/encryption.service';
+import { filecoinService, isConfigured, getWalletAddress } from '@/services/filecoin.service';
+import { generateKey, encrypt } from '@/services/encryption.service';
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('\n🚀 Testing Filecoin Synapse Upload via API\n');
+    console.log('\n🚀 Testing Filecoin Upload via API\n');
 
     // Test 1: Check configuration
-    const networkInfo = filecoinSynapseService.getNetworkInfo();
-    console.log('📋 Network Info:', networkInfo);
-
-    if (!networkInfo.configured) {
+    if (!isConfigured()) {
       return NextResponse.json(
         {
           error: 'Filecoin not configured',
@@ -28,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Test 2: Check balance
     console.log('💰 Checking balance...');
-    const balance = await filecoinSynapseService.getWalletBalance();
+    const balance = await filecoinService.getBalance();
     console.log(`Balance: ${balance} tFIL`);
 
     if (parseFloat(balance) < 0.2) {
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Test 4: Create test order
+    // Test 3: Create test order
     const testOrder = {
       id: `order-${Date.now()}`,
       orderId: 'API-TEST-001',
@@ -61,19 +58,19 @@ export async function GET(request: NextRequest) {
       createdAt: new Date().toISOString(),
     };
 
-    console.log('📦 Test order:', testOrder);
+    console.log('📎 Test order:', testOrder);
 
-    // Test 5: Encrypt order
+    // Test 4: Encrypt order
     console.log('🔐 Encrypting order...');
-    const encryptionKey = encryptionService.generateKey();
-    const encrypted = encryptionService.encrypt(JSON.stringify(testOrder), encryptionKey);
+    const encryptionKey = generateKey();
+    const encrypted = encrypt(testOrder, encryptionKey);
     console.log('✅ Order encrypted');
 
-    // Test 6: Upload to Filecoin
-    console.log('📤 Uploading to Filecoin via Synapse SDK...');
-    const uploadResult = await filecoinSynapseService.uploadOrderToFilecoin(
+    // Test 5: Upload to Filecoin
+    console.log('📤 Uploading to Filecoin...');
+    const uploadResult = await filecoinService.uploadOrder(
       testOrder,
-      encrypted.ciphertext
+      encryptionKey
     );
 
     console.log('✅ Upload successful!');
@@ -85,11 +82,10 @@ export async function GET(request: NextRequest) {
         message: 'Filecoin upload test successful',
         data: {
           cid: uploadResult.cid,
-          size: uploadResult.size,
+          fileSize: uploadResult.fileSize,
           uploadedAt: uploadResult.uploadedAt,
-          network: uploadResult.network,
-          wallet: networkInfo.walletAddress,
-          balance: balance,
+          wallet: getWalletAddress(),
+          balance,
           gateway: `https://gateway.lighthouse.storage/ipfs/${uploadResult.cid}`,
           explorer: `https://calibration.filfox.info/en/tx/${uploadResult.transactionHash}`,
         },

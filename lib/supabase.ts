@@ -28,6 +28,7 @@ export interface Order {
   }
   payment_method: string
   cid?: string | null // Filecoin CID
+  encryption_salt?: string | null // Salt for key derivation
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered'
   created_at: string
   updated_at: string

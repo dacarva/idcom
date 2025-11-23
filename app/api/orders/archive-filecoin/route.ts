@@ -48,24 +48,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload order to Filecoin
-    const uploadResult = await filecoinService.uploadOrder(orderData);
+    // Kick off background upload (do not await)
+    const startedAt = new Date().toISOString();
+    filecoinService
+      .uploadOrder(orderData)
+      .then((uploadResult) => {
+        try {
+          const verifiableLink = filecoinService.generateVerifiableLink(uploadResult.cid);
+          console.log(
+            `✅ Background archive complete | CID: ${uploadResult.cid} | Link: ${verifiableLink}`
+          );
+        } catch {}
+      })
+      .catch((e) => {
+        console.error('❌ Background archive failed:', e);
+      });
 
-    // Generate verifiable link
-    const verifiableLink = filecoinService.generateVerifiableLink(uploadResult.cid);
-
+    // Return immediately with pending status
     return NextResponse.json(
       {
         success: true,
-        cid: uploadResult.cid,
-        ipfsUrl: uploadResult.ipfsUrl,
-        verifiableLink,
-        fileSize: uploadResult.fileSize,
-        uploadedAt: uploadResult.uploadedAt,
-        redundantLinks: filecoinService.generateRedundantLinks(uploadResult.cid),
-        message: '✅ Order successfully archived to Filecoin (permanent storage)',
+        status: 'pending',
+        message: 'Archival queued. Check order detail later for CID.',
+        startedAt,
+        orderId: orderData.orderId,
       },
-      { status: 201 }
+      { status: 202 }
     );
   } catch (error) {
     console.error('❌ Archive endpoint error:', error);

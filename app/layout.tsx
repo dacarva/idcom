@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import '../styles/globals.css'
 import { Plus_Jakarta_Sans } from 'next/font/google'
+import RootLayoutContent from '@/components/RootLayoutContent'
 
 const plusJakarta = Plus_Jakarta_Sans({
 	subsets: ['latin'],
@@ -25,7 +26,7 @@ export default function RootLayout (
 	return (
 		<html lang='es' className='light'>
 			<body className={`${plusJakarta.className} bg-background-light`}>
-				<main role='main'>{children}</main>
+				<RootLayoutContent>{children}</RootLayoutContent>
 			</body>
 		</html>
 	)
